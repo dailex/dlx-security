@@ -1,0 +1,34 @@
+migration_loaders:
+  dlx.security.event_store:
+    class: Daikon\Flysystem\Migration\FlysystemMigrationLoader
+    connector: dlx.security.filesystem
+    settings:
+      location: migration://couchdb
+
+  dlx.security.projection_store.standard:
+    class: Daikon\Flysystem\Migration\FlysystemMigrationLoader
+    connector: dlx.security.filesystem
+    settings:
+      location: migration://elasticsearch
+
+migration_adapters:
+  dlx.security.event_store:
+    class: Daikon\CouchDb\Migration\CouchDbMigrationAdapter
+    connector: dlx.security.event_store
+
+  dlx.security.projection_store.standard:
+    class: Daikon\Elasticsearch5\Migration\Elasticsearch5MigrationAdapter
+    connector: dlx.security.projection_store.standard
+    settings:
+      type: dlx-testing-migration_list
+
+migration_targets:
+  dlx.security.event_store:
+    enabled: true
+    migration_adapter: dlx.security.event_store
+    migration_loader: dlx.security.event_store
+
+  dlx.security.projection_store.standard:
+    enabled: true
+    migration_adapter: dlx.security.projection_store.standard
+    migration_loader: dlx.security.projection_store.standard

@@ -1,0 +1,16 @@
+storage_adapters:
+  dlx.security.user.standard:
+    class: Daikon\Elasticsearch5\Storage\Elasticsearch5StorageAdapter
+    connector: dlx.security.projection_store.standard
+    settings:
+      type: dlx-security-user-standard
+
+projectors:
+  dlx.security.user.standard:
+    class: Daikon\ReadModel\Projector\StandardProjector
+    repository: dlx.security.user.standard
+
+repositories:
+   dlx.security.user.standard:
+     class: Dlx\Security\User\Repository\Standard\UserRepository
+     storage_adapter: dlx.security.user.standard

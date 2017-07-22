@@ -1,0 +1,35 @@
+dlx.security:
+  infrastructure:
+    user_provider:
+      class: Dlx\Security\Service\UserProvider
+      provisioner:
+        class: Dlx\Security\Service\Provisioner\UserProviderProvisioner
+
+    user_manager:
+      class: Dlx\Security\Service\UserManager
+      provisioner:
+        class: Dailex\Service\Provisioner\DefaultProvisioner
+
+    password_encoder:
+      class: Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder
+      provisioner:
+        class: Dailex\Service\Provisioner\SilexServiceProvisioner
+        settings:
+          app_key: security.encoder.bcrypt
+          alias: Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface
+
+    token_storage:
+      class: Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage
+      provisioner:
+        class: Dailex\Service\Provisioner\SilexServiceProvisioner
+        settings:
+          app_key: security.token_storage
+          alias: Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface
+
+    authorization_checker:
+      class: Symfony\Component\Security\Core\Authorization\AuthorizationChecker
+      provisioner:
+        class: Dailex\Service\Provisioner\SilexServiceProvisioner
+        settings:
+          app_key: security.authorization_checker
+          alias: Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface

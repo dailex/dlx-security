@@ -1,0 +1,23 @@
+{% extends "@project/layout.html.twig" %}
+
+{% block content %}
+<section id="user-collection">
+    <h1>Users</h1>
+    <table>
+        <thead>
+            <tr>
+                <td>Username</td>
+                <td>Email</td>
+            </tr>
+        </thead>
+        <tbody>
+        {% for user in users.currentPageResults %}
+            <tr>
+                <td><a href="{{  path('dlx.security.users.resource', {userId:user.aggregateId}) }}">{{ user.username }}</a></td>
+                <td>{{ user.email }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</section>
+{% endblock %}

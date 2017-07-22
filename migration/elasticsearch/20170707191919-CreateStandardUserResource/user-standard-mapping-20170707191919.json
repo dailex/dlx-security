@@ -1,0 +1,52 @@
+{
+    "dynamic_templates": [
+        {
+            "daikon_keyword": {
+                "match_pattern": "regex",
+                "match": "^(@type|@parent|aggregateId)$",
+                "mapping": {
+                    "type": "keyword"
+                }
+            }
+        }
+    ],
+    "properties": {
+        "username": {
+            "type": "text",
+            "fields": {
+                "keyword": {
+                    "type": "keyword"
+                }
+            }
+        },
+        "email": {
+            "type": "keyword"
+        },
+        "locale": {
+            "type": "keyword"
+        },
+        "role": {
+            "type": "keyword"
+        },
+        "firstname": {
+            "type": "text",
+            "fields": {
+                "keyword": {
+                    "type": "keyword"
+                }
+            }
+        },
+        "lastname": {
+            "type": "text",
+            "fields": {
+                "keyword": {
+                    "type": "keyword"
+                }
+            }
+        },
+        "password_hash": {
+            "type": "keyword",
+            "index": false
+        }
+    }
+}

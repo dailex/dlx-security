@@ -1,0 +1,12 @@
+{% extends "@project/layout.html.twig" %}
+
+{% block content %}
+<section id="user">
+    <h1>User</h1>
+    <ul>
+        <li><dt>Identifier</dt><dd>{{ user.identifier }}</dd></li>
+        <li><dt>Username</dt><dd>{{ user.username }}</dd></li>
+        <li><dt>Email</dt><dd>{{ user.email }}</dd></li>
+    </ul>
+</section>
+{% endblock %}
