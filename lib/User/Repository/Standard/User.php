@@ -4,6 +4,8 @@ namespace Dlx\Security\User\Repository\Standard;
 
 use Daikon\ReadModel\Projection\ProjectionInterface;
 use Daikon\ReadModel\Projection\ProjectionTrait;
+use Dlx\Security\User\Domain\Entity\AuthToken\AuthToken;
+use Dlx\Security\User\Domain\Event\AuthTokenWasAdded;
 use Dlx\Security\User\Domain\Event\UserWasRegistered;
 use Dlx\Security\User\Domain\Event\UserWasUpdated;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
@@ -88,9 +90,29 @@ final class User implements ProjectionInterface, AdvancedUserInterface
         ));
     }
 
+    private function whenAuthTokenWasAdded(AuthTokenWasAdded $tokenWasAdded)
+    {
+        return self::fromArray(array_merge_recursive(
+            $this->state,
+            [
+                'tokens' => [[
+                    'id' => $tokenWasAdded->getId()->toNative(),
+                    'token' => $tokenWasAdded->getToken()->toNative(),
+                    'expires_at' => $tokenWasAdded->getExpiresAt()->toNative(),
+                    '@type' => AuthToken::class
+                ]]
+            ]
+        ));
+    }
+
     public function getRoles(): array
     {
         return [$this->state['role']];
+    }
+
+    public function getTokens(): array
+    {
+        return $this->state['tokens'];
     }
 
     public function getPassword(): string

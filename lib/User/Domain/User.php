@@ -8,6 +8,7 @@ use Daikon\EventSourcing\Aggregate\AggregateRootTrait;
 use Dlx\Security\User\Domain\Command\RegisterUser;
 use Dlx\Security\User\Domain\Command\UpdateUser;
 use Dlx\Security\User\Domain\Entity\UserEntityType;
+use Dlx\Security\User\Domain\Event\AuthTokenWasAdded;
 use Dlx\Security\User\Domain\Event\UserWasRegistered;
 use Dlx\Security\User\Domain\Event\UserWasUpdated;
 
@@ -25,7 +26,8 @@ final class User implements AggregateRootInterface
     public static function register(RegisterUser $registerUser): self
     {
         return (new self($registerUser->getAggregateId()))
-            ->reflectThat(UserWasRegistered::viaCommand($registerUser));
+            ->reflectThat(UserWasRegistered::viaCommand($registerUser))
+            ->reflectThat(AuthTokenWasAdded::viaCommand($registerUser));
     }
 
     public function update(UpdateUser $updateUser): self
@@ -33,7 +35,7 @@ final class User implements AggregateRootInterface
         return $this->reflectThat(UserWasUpdated::viaCommand($updateUser));
     }
 
-    protected function whenUserWasRegistered(UserWasRegistered $userWasRegistered)
+    private function whenUserWasRegistered(UserWasRegistered $userWasRegistered)
     {
         $this->userState = (new UserEntityType)->makeEntity()
             ->withUsername($userWasRegistered->getUsername())
@@ -43,5 +45,14 @@ final class User implements AggregateRootInterface
             ->withFirstname($userWasRegistered->getFirstname())
             ->withLastname($userWasRegistered->getLastname())
             ->withLocale($userWasRegistered->getLocale());
+    }
+
+    private function whenAuthTokenWasAdded(AuthTokenWasAdded $tokenWasAdded)
+    {
+        $this->userState = $this->userState->withAuthTokenAdded([
+            'id' => $tokenWasAdded->getId(),
+            'token' => $tokenWasAdded->getToken(),
+            'expires_at' => $tokenWasAdded->getExpiresAt()
+        ]);
     }
 }

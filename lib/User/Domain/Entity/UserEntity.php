@@ -10,6 +10,7 @@ use Daikon\Entity\ValueObject\ValueObjectInterface;
 use Daikon\EventSourcing\Aggregate\AggregateId;
 use Dlx\Security\User\Domain\ValueObject\UserRole;
 use Dlx\Security\User\Domain\ValueObject\UserState;
+use Daikon\Entity\Entity\NestedEntityList;
 
 final class UserEntity extends Entity
 {
@@ -101,5 +102,24 @@ final class UserEntity extends Entity
     public function withState(UserState $state): self
     {
         return $this->withValue('state', $state);
+    }
+
+    public function getTokens(): NestedEntityList
+    {
+        return $this->get('tokens');
+    }
+
+    public function withAuthTokenAdded(array $tokenPayload): self
+    {
+        return $this->addToken($tokenPayload, "auth_token");
+    }
+
+    private function addToken(array $tokenPayload, string $type): self
+    {
+        $tokensAttribute = $this->getEntityType()->getAttribute('tokens');
+        $tokenType = $tokensAttribute->getValueType()->get($type);
+        $token = $tokenType->makeEntity($tokenPayload, $this);
+        $userState = $this->withValue('tokens', $this->getTokens()->push($token));
+        return $userState;
     }
 }

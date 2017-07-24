@@ -37,6 +37,21 @@ final class UserWasRegistered extends DomainEvent
         return User::class;
     }
 
+    public static function viaCommand(RegisterUser $registerUser): self
+    {
+        return new self(
+            $registerUser->getAggregateId(),
+            $registerUser->getUsername(),
+            $registerUser->getEmail(),
+            $registerUser->getRole(),
+            $registerUser->getFirstname(),
+            $registerUser->getLastname(),
+            $registerUser->getLocale(),
+            $registerUser->getPasswordHash(),
+            UserState::fromNative(UserState::INITIAL)
+        );
+    }
+
     public static function fromArray(array $nativeValues): MessageInterface
     {
         return new self(
@@ -50,20 +65,6 @@ final class UserWasRegistered extends DomainEvent
             Text::fromNative($nativeValues['password_hash']),
             UserState::fromNative($nativeValues['state']),
             AggregateRevision::fromNative($nativeValues['aggregateRevision'])
-        );
-    }
-
-    public static function viaCommand(RegisterUser $registerUser): self
-    {
-        return new self(
-            $registerUser->getAggregateId(),
-            $registerUser->getUsername(),
-            $registerUser->getEmail(),
-            $registerUser->getRole(),
-            $registerUser->getFirstname(),
-            $registerUser->getLastname(),
-            $registerUser->getLocale(),
-            $registerUser->getPasswordHash()
         );
     }
 
@@ -114,19 +115,16 @@ final class UserWasRegistered extends DomainEvent
 
     public function toArray(): array
     {
-        return array_merge(
-            parent::toArray(),
-            [
-                'username' => $this->username->toNative(),
-                'email' => $this->email->toNative(),
-                'role' => $this->role->toNative(),
-                'firstname' => $this->firstname->toNative(),
-                'lastname' => $this->lastname->toNative(),
-                'locale' => $this->locale->toNative(),
-                'password_hash' => $this->passwordHash->toNative(),
-                'state' => $this->state->toNative()
-            ]
-        );
+        return array_merge([
+            'username' => $this->username->toNative(),
+            'email' => $this->email->toNative(),
+            'role' => $this->role->toNative(),
+            'firstname' => $this->firstname->toNative(),
+            'lastname' => $this->lastname->toNative(),
+            'locale' => $this->locale->toNative(),
+            'password_hash' => $this->passwordHash->toNative(),
+            'state' => $this->state->toNative()
+        ], parent::toArray());
     }
 
     protected function __construct(
@@ -138,7 +136,7 @@ final class UserWasRegistered extends DomainEvent
         Text $lastname,
         Text $locale,
         Text $passwordHash,
-        UserState $state = null,
+        UserState $state,
         AggregateRevision $revision = null
     ) {
         parent::__construct($aggregateId, $revision);
@@ -149,6 +147,6 @@ final class UserWasRegistered extends DomainEvent
         $this->lastname = $lastname;
         $this->locale = $locale;
         $this->passwordHash = $passwordHash;
-        $this->state = $state ?? UserState::fromNative(UserState::INITIAL);
+        $this->state = $state;
     }
 }

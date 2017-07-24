@@ -50,6 +50,23 @@
         },
         "state": {
             "type": "keyword"
+        },
+        "tokens": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "keyword"
+                },
+                "service": {
+                    "type": "keyword"
+                },
+                "token": {
+                    "type": "keyword"
+                },
+                "expires_at": {
+                    "type": "date"
+                }
+            }
         }
     }
 }
