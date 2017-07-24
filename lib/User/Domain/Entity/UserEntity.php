@@ -8,6 +8,7 @@ use Daikon\Entity\ValueObject\Text;
 use Daikon\Entity\ValueObject\Uuid;
 use Daikon\Entity\ValueObject\ValueObjectInterface;
 use Daikon\EventSourcing\Aggregate\AggregateId;
+use Dlx\Security\User\Domain\ValueObject\UserState;
 
 final class UserEntity extends Entity
 {
@@ -89,5 +90,15 @@ final class UserEntity extends Entity
     public function withLocale(Text $locale): self
     {
         return $this->withValue('locale', $locale);
+    }
+
+    public function getState(): UserState
+    {
+        return $this->get('state');
+    }
+
+    public function withState(UserState $state): self
+    {
+        return $this->withValue('state', $state);
     }
 }

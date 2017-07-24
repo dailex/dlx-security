@@ -91,7 +91,7 @@ final class RegisterUser extends Command
                 'firstname' => $this->firstname->toNative(),
                 'lastname' => $this->lastname->toNative(),
                 'locale' => $this->locale->toNative(),
-                'password_hash' => $this->passwordHash->toNative(),
+                'password_hash' => $this->passwordHash->toNative()
             ]
         );
     }

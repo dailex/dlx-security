@@ -4,8 +4,7 @@ namespace Dlx\Security\Service;
 
 use Daikon\Elasticsearch5\Query\Elasticsearch5Query;
 use Daikon\ReadModel\Repository\RepositoryMap;
-use Dlx\Security\User\OauthUser;
-use Dlx\Security\User\User;
+use Dlx\Security\User\Repository\Standard\User;
 use Gigablah\Silex\OAuth\Security\Authentication\Token\OAuthTokenInterface;
 use Gigablah\Silex\OAuth\Security\User\Provider\OAuthUserProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -40,7 +39,7 @@ final class UserProvider implements UserProviderInterface, OAuthUserProviderInte
             throw new UsernameNotFoundException;
         }
 
-        return new User($user->toArray());
+        return $user;
     }
 
     public function loadUserByUsername($username)
@@ -72,7 +71,7 @@ final class UserProvider implements UserProviderInterface, OAuthUserProviderInte
 
     public function supportsClass($class)
     {
-        return User::CLASS === $class || is_subclass_of($class, User::CLASS);
+        return User::class === $class;
     }
 
     private function getUserRepository()

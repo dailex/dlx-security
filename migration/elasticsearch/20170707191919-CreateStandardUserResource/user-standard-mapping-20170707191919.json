@@ -47,6 +47,9 @@
         "password_hash": {
             "type": "keyword",
             "index": false
+        },
+        "state": {
+            "type": "keyword"
         }
     }
 }

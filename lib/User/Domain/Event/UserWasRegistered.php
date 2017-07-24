@@ -11,6 +11,7 @@ use Daikon\EventSourcing\Aggregate\Event\DomainEventInterface;
 use Daikon\MessageBus\MessageInterface;
 use Dlx\Security\User\Domain\User;
 use Dlx\Security\User\Domain\Command\RegisterUser;
+use Dlx\Security\User\Domain\ValueObject\UserState;
 
 final class UserWasRegistered extends DomainEvent
 {
@@ -28,6 +29,8 @@ final class UserWasRegistered extends DomainEvent
 
     private $passwordHash;
 
+    private $state;
+
     public static function getAggregateRootClass(): string
     {
         return User::class;
@@ -44,6 +47,7 @@ final class UserWasRegistered extends DomainEvent
             Text::fromNative($nativeValues['lastname']),
             Text::fromNative($nativeValues['locale']),
             Text::fromNative($nativeValues['password_hash']),
+            UserState::fromNative($nativeValues['state']),
             AggregateRevision::fromNative($nativeValues['aggregateRevision'])
         );
     }
@@ -102,6 +106,11 @@ final class UserWasRegistered extends DomainEvent
         return $this->passwordHash;
     }
 
+    public function getState(): UserState
+    {
+        return $this->state;
+    }
+
     public function toArray(): array
     {
         return array_merge(
@@ -114,6 +123,7 @@ final class UserWasRegistered extends DomainEvent
                 'lastname' => $this->lastname->toNative(),
                 'locale' => $this->locale->toNative(),
                 'password_hash' => $this->passwordHash->toNative(),
+                'state' => $this->state->toNative()
             ]
         );
     }
@@ -127,6 +137,7 @@ final class UserWasRegistered extends DomainEvent
         Text $lastname,
         Text $locale,
         Text $passwordHash,
+        UserState $state = null,
         AggregateRevision $revision = null
     ) {
         parent::__construct($aggregateId, $revision);
@@ -137,5 +148,6 @@ final class UserWasRegistered extends DomainEvent
         $this->lastname = $lastname;
         $this->locale = $locale;
         $this->passwordHash = $passwordHash;
+        $this->state = $state ?? UserState::fromNative(UserState::INITIAL);
     }
 }
