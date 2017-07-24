@@ -2,6 +2,7 @@
 
 namespace Dlx\Security\User\Controller;
 
+use Daikon\Elasticsearch5\Query\Elasticsearch5Query;
 use Daikon\ReadModel\Repository\RepositoryMap;
 use Dlx\Security\User\View\CollectionSuccessView;
 use Pagerfanta\Adapter\FixedAdapter;
@@ -33,9 +34,7 @@ final class CollectionController
     private function loadUsers($query, $page, $size)
     {
         $repository = $this->repositoryMap->get('dlx.security.user.standard');
-        $users = $repository->search([
-            //query
-        ], 0, 10);
+        $users = $repository->search(new Elasticsearch5Query, 0, 10);
 
         return (new Pagerfanta(new FixedAdapter($users->count(), $users->toArray())))
             ->setMaxPerPage($size) // call before setCurrentPage()

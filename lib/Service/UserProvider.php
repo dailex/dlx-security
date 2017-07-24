@@ -2,11 +2,12 @@
 
 namespace Dlx\Security\Service;
 
-use Gigablah\Silex\OAuth\Security\Authentication\Token\OAuthTokenInterface;
-use Gigablah\Silex\OAuth\Security\User\Provider\OAuthUserProviderInterface;
+use Daikon\Elasticsearch5\Query\Elasticsearch5Query;
 use Daikon\ReadModel\Repository\RepositoryMap;
 use Dlx\Security\User\OauthUser;
 use Dlx\Security\User\User;
+use Gigablah\Silex\OAuth\Security\Authentication\Token\OAuthTokenInterface;
+use Gigablah\Silex\OAuth\Security\User\Provider\OAuthUserProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
@@ -60,9 +61,7 @@ final class UserProvider implements UserProviderInterface, OAuthUserProviderInte
 
     public function userExists($username, $email, array $ignoreIds = [])
     {
-        $users = $this->getUserRepository()->search([
-            //@query
-        ], 0, 1);
+        $users = $this->getUserRepository()->search(new Elasticsearch5Query, 0, 1);
 
         return $users->count() > 0;
     }
