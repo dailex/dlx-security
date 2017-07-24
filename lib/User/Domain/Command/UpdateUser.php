@@ -16,15 +16,11 @@ final class UpdateUser extends Command
 
     private $email;
 
-    private $role;
-
     private $firstname;
 
     private $lastname;
 
     private $locale;
-
-    private $passwordHash;
 
     public static function getAggregateRootClass(): string
     {
@@ -37,11 +33,9 @@ final class UpdateUser extends Command
             AggregateId::fromNative($nativeValues['aggregateId']),
             Text::fromNative($nativeValues['username']),
             Email::fromNative($nativeValues['email']),
-            Text::fromNative($nativeValues['role']),
             Text::fromNative($nativeValues['firstname']),
             Text::fromNative($nativeValues['lastname']),
-            Text::fromNative($nativeValues['locale']),
-            Text::fromNative($nativeValues['password_hash'])
+            Text::fromNative($nativeValues['locale'])
         );
     }
 
@@ -53,11 +47,6 @@ final class UpdateUser extends Command
     public function getEmail(): Email
     {
         return $this->email;
-    }
-
-    public function getRole(): Text
-    {
-        return $this->role;
     }
 
     public function getFirstname(): Text
@@ -75,11 +64,6 @@ final class UpdateUser extends Command
         return $this->locale;
     }
 
-    public function getPasswordHash(): Text
-    {
-        return $this->passwordHash;
-    }
-
     public function toArray(): array
     {
         return array_merge(
@@ -87,11 +71,9 @@ final class UpdateUser extends Command
             [
                 'username' => $this->username->toNative(),
                 'email' => $this->email->toNative(),
-                'role' => $this->role->toNative(),
                 'firstname' => $this->firstname->toNative(),
                 'lastname' => $this->lastname->toNative(),
-                'locale' => $this->locale->toNative(),
-                'password_hash' => $this->passwordHash->toNative(),
+                'locale' => $this->locale->toNative()
             ]
         );
     }
@@ -100,19 +82,15 @@ final class UpdateUser extends Command
         AggregateId $aggregateId,
         Text $username,
         Email $email,
-        Text $role,
         Text $firstname,
         Text $lastname,
-        Text $locale,
-        Text $passwordHash
+        Text $locale
     ) {
         parent::__construct($aggregateId);
         $this->username = $username;
         $this->email = $email;
-        $this->role = $role;
         $this->firstname = $firstname;
         $this->lastname = $lastname;
         $this->locale = $locale;
-        $this->passwordHash = $passwordHash;
     }
 }

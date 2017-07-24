@@ -59,9 +59,7 @@ final class FormLoginAuthenticator extends AbstractFormLoginAuthenticator
 
     public function getUser($credentials, UserProviderInterface $userProvider)
     {
-        $user = $userProvider->loadUserByUsername($credentials['username']);
-
-        return new User($user->toArray());
+        return $userProvider->loadUserByUsername($credentials['username']);
     }
 
     public function checkCredentials($credentials, UserInterface $user)

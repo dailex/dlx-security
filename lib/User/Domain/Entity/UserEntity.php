@@ -8,6 +8,7 @@ use Daikon\Entity\ValueObject\Text;
 use Daikon\Entity\ValueObject\Uuid;
 use Daikon\Entity\ValueObject\ValueObjectInterface;
 use Daikon\EventSourcing\Aggregate\AggregateId;
+use Dlx\Security\User\Domain\ValueObject\UserRole;
 use Dlx\Security\User\Domain\ValueObject\UserState;
 
 final class UserEntity extends Entity
@@ -42,12 +43,12 @@ final class UserEntity extends Entity
         return $this->withValue('email', $email);
     }
 
-    public function getRole(): Text
+    public function getRole(): UserRole
     {
         return $this->get('role');
     }
 
-    public function withRole(Text $role): self
+    public function withRole(UserRole $role): self
     {
         return $this->withValue('role', $role);
     }

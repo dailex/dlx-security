@@ -9,6 +9,7 @@ use Daikon\EventSourcing\Aggregate\AggregateIdInterface;
 use Daikon\EventSourcing\Aggregate\Command\Command;
 use Daikon\MessageBus\MessageInterface;
 use Dlx\Security\User\Domain\User;
+use Dlx\Security\User\Domain\ValueObject\UserRole;
 
 final class RegisterUser extends Command
 {
@@ -37,7 +38,7 @@ final class RegisterUser extends Command
             AggregateId::fromNative($nativeValues['aggregateId']),
             Text::fromNative($nativeValues['username']),
             Email::fromNative($nativeValues['email']),
-            Text::fromNative($nativeValues['role']),
+            UserRole::fromNative($nativeValues['role']),
             Text::fromNative($nativeValues['firstname']),
             Text::fromNative($nativeValues['lastname']),
             Text::fromNative($nativeValues['locale']),
@@ -55,7 +56,7 @@ final class RegisterUser extends Command
         return $this->email;
     }
 
-    public function getRole(): Text
+    public function getRole(): UserRole
     {
         return $this->role;
     }
@@ -100,7 +101,7 @@ final class RegisterUser extends Command
         AggregateId $aggregateId,
         Text $username,
         Email $email,
-        Text $role,
+        UserRole $role,
         Text $firstname,
         Text $lastname,
         Text $locale,

@@ -11,6 +11,7 @@ use Daikon\EventSourcing\Aggregate\Event\DomainEventInterface;
 use Daikon\MessageBus\MessageInterface;
 use Dlx\Security\User\Domain\User;
 use Dlx\Security\User\Domain\Command\RegisterUser;
+use Dlx\Security\User\Domain\ValueObject\UserRole;
 use Dlx\Security\User\Domain\ValueObject\UserState;
 
 final class UserWasRegistered extends DomainEvent
@@ -42,7 +43,7 @@ final class UserWasRegistered extends DomainEvent
             AggregateId::fromNative($nativeValues['aggregateId']),
             Text::fromNative($nativeValues['username']),
             Email::fromNative($nativeValues['email']),
-            Text::fromNative($nativeValues['role']),
+            UserRole::fromNative($nativeValues['role']),
             Text::fromNative($nativeValues['firstname']),
             Text::fromNative($nativeValues['lastname']),
             Text::fromNative($nativeValues['locale']),
@@ -81,7 +82,7 @@ final class UserWasRegistered extends DomainEvent
         return $this->email;
     }
 
-    public function getRole(): Text
+    public function getRole(): UserRole
     {
         return $this->role;
     }
@@ -132,7 +133,7 @@ final class UserWasRegistered extends DomainEvent
         AggregateId $aggregateId,
         Text $username,
         Email $email,
-        Text $role,
+        UserRole $role,
         Text $firstname,
         Text $lastname,
         Text $locale,

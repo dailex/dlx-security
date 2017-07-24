@@ -1,0 +1,11 @@
+{% extends "@project/layout.html.twig" %}
+
+{% block content %}
+<section id="authentication">
+    <form method="post" action="{{ path('dlx.security.authenticate') }}">
+        {{ form_widget(form) }}
+        <button type="submit">Login</button>
+        <a href="{{ path('dlx.security.registration') }}">Register</a>
+    </form>
+</section>
+{% endblock %}

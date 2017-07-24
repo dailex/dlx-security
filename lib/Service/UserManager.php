@@ -34,7 +34,7 @@ final class UserManager
         $this->translator = $translator;
     }
 
-    public function registerUser(array $values, $role = null)
+    public function registerUser(array $values, $role = null): void
     {
         if (isset($values['password'])) {
             $values['password_hash'] = $this->passwordEncoder->encodePassword($values['password'], null);
@@ -59,6 +59,10 @@ final class UserManager
 
         $registerUser = RegisterUser::fromArray($values);
         $this->messageBus->publish($registerUser, 'commands');
+    }
+
+    public function loginUser(AdvancedUserInterface $user): void
+    {
     }
 
     public function getDefaultRole()

@@ -26,9 +26,9 @@ final class UserRepository implements RepositoryInterface
     {
     }
 
-    public function search(QueryInterface $query, $from, $size): ProjectionMap
+    public function search(QueryInterface $query, int $from = null, int $size = null): ProjectionMap
     {
-        return $this->storageAdapter->search($query, $from, $size);
+        return $this->storageAdapter->search($query, $from ?? 0, $size ?? 10);
     }
 
     public function persist(ProjectionInterface $projection): bool
