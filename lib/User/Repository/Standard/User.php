@@ -92,9 +92,10 @@ final class User implements ProjectionInterface, AdvancedUserInterface
 
     private function whenAuthTokenWasAdded(AuthTokenWasAdded $tokenWasAdded)
     {
-        return self::fromArray(array_merge_recursive(
+        return self::fromArray(array_merge(
             $this->state,
             [
+                'aggregateRevision' => $tokenWasAdded->getAggregateRevision()->toNative(),
                 'tokens' => [[
                     'id' => $tokenWasAdded->getId()->toNative(),
                     'token' => $tokenWasAdded->getToken()->toNative(),

@@ -3,6 +3,7 @@
 namespace Dlx\Security\User\Domain\Entity;
 
 use Daikon\Entity\Entity\Entity;
+use Daikon\Entity\Entity\NestedEntityList;
 use Daikon\Entity\ValueObject\Email;
 use Daikon\Entity\ValueObject\Text;
 use Daikon\Entity\ValueObject\Uuid;
@@ -10,7 +11,6 @@ use Daikon\Entity\ValueObject\ValueObjectInterface;
 use Daikon\EventSourcing\Aggregate\AggregateId;
 use Dlx\Security\User\Domain\ValueObject\UserRole;
 use Dlx\Security\User\Domain\ValueObject\UserState;
-use Daikon\Entity\Entity\NestedEntityList;
 
 final class UserEntity extends Entity
 {
