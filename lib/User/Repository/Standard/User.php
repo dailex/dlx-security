@@ -7,6 +7,7 @@ use Daikon\ReadModel\Projection\ProjectionTrait;
 use Dlx\Security\User\Domain\Entity\AuthToken\AuthToken;
 use Dlx\Security\User\Domain\Event\AuthTokenWasAdded;
 use Dlx\Security\User\Domain\Event\UserWasLoggedIn;
+use Dlx\Security\User\Domain\Event\UserWasLoggedOut;
 use Dlx\Security\User\Domain\Event\UserWasRegistered;
 use Dlx\Security\User\Domain\Event\UserWasUpdated;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
@@ -121,6 +122,26 @@ final class User implements ProjectionInterface, AdvancedUserInterface
             $this->state,
             [
                 'aggregateRevision' => $userWasLoggedIn->getAggregateRevision()->toNative(),
+                'tokens' => $tokens
+            ]
+        ));
+    }
+
+    private function whenUserWasLoggedOut(UserWasLoggedOut $userWasLoggedOut)
+    {
+        $tokens = [];
+        foreach ($this->getTokens() as $token) {
+            if ($userWasLoggedOut->getAuthTokenId()->toNative() === $token['id']) {
+                $token['token'] = $userWasLoggedOut->getAuthToken()->toNative();
+                $token['expiresAt'] = $userWasLoggedOut->getAuthTokenExpiresAt()->toNative();
+            }
+            $tokens[] = $token;
+        }
+
+        return self::fromArray(array_merge(
+            $this->state,
+            [
+                'aggregateRevision' => $userWasLoggedOut->getAggregateRevision()->toNative(),
                 'tokens' => $tokens
             ]
         ));

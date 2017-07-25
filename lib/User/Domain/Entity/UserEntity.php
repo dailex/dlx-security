@@ -126,6 +126,20 @@ final class UserEntity extends Entity
         return $this->withValue('tokens', new NestedEntityList($tokens));
     }
 
+    public function withUserLoggedOut(array $payload): self
+    {
+        $tokens = [];
+        foreach ($this->getTokens() as $token) {
+            if ($token->getIdentity()->equals($payload['id'])) {
+                $token = $token
+                    ->withValue('token', $payload['token'])
+                    ->withValue('expiresAt', $payload['expiresAt']);
+            }
+            $tokens[] = $token;
+        }
+        return $this->withValue('tokens', new NestedEntityList($tokens));
+    }
+
     private function addToken(array $tokenPayload, string $type): self
     {
         $tokensAttribute = $this->getEntityType()->getAttribute('tokens');

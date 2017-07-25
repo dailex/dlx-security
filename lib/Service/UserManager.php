@@ -6,6 +6,7 @@ use Daikon\Config\ConfigProviderInterface;
 use Daikon\Entity\ValueObject\Timestamp;
 use Daikon\MessageBus\MessageBusInterface;
 use Dlx\Security\User\Domain\Command\LoginUser;
+use Dlx\Security\User\Domain\Command\LogoutUser;
 use Dlx\Security\User\Domain\Command\RegisterUser;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
@@ -68,6 +69,16 @@ final class UserManager
         ]);
 
         $this->messageBus->publish($loginUser, 'commands');
+    }
+
+    public function logoutUser(AdvancedUserInterface $user): void
+    {
+        $logoutUser = LogoutUser::fromArray([
+            'aggregateId' => $user->getAggregateId(),
+            'authTokenId' => $user->getToken('auth_token')['id']
+        ]);
+
+        $this->messageBus->publish($logoutUser, 'commands');
     }
 
     public function getDefaultRole()

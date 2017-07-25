@@ -12,13 +12,13 @@ use Symfony\Component\Security\Http\Logout\LogoutSuccessHandlerInterface;
 
 final class UserLogoutListener implements LogoutSuccessHandlerInterface
 {
-    protected $httpUtils;
+    private $httpUtils;
 
-    protected $tokenStorage;
+    private $tokenStorage;
 
-    protected $userManager;
+    private $userManager;
 
-    protected $targetUrl;
+    private $targetUrl;
 
     public function __construct(
         HttpUtils $httpUtils,
