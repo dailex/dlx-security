@@ -41,7 +41,8 @@ final class AuthTokenWasAdded extends DomainEvent
             AggregateId::fromNative($nativeArray['aggregateId']),
             Uuid::fromNative($nativeArray['id']),
             RandomToken::fromNative($nativeArray['token']),
-            Timestamp::fromNative($nativeArray['expiresAt'])
+            Timestamp::fromNative($nativeArray['expiresAt']),
+            AggregateRevision::fromNative($nativeArray['aggregateRevision'])
         );
     }
 

@@ -116,6 +116,14 @@ final class UserEntity extends Entity
 
     public function withUserLoggedIn(array $payload): self
     {
+        $tokens = [];
+        foreach ($this->getTokens() as $token) {
+            if ($token->getIdentity()->equals($payload['id'])) {
+                $token = $token->withValue('expiresAt', $payload['expiresAt']);
+            }
+            $tokens[] = $token;
+        }
+        return $this->withValue('tokens', new NestedEntityList($tokens));
     }
 
     private function addToken(array $tokenPayload, string $type): self
@@ -123,7 +131,6 @@ final class UserEntity extends Entity
         $tokensAttribute = $this->getEntityType()->getAttribute('tokens');
         $tokenType = $tokensAttribute->getValueType()->get($type);
         $token = $tokenType->makeEntity($tokenPayload, $this);
-        $userState = $this->withValue('tokens', $this->getTokens()->push($token));
-        return $userState;
+        return $this->withValue('tokens', $this->getTokens()->push($token));
     }
 }

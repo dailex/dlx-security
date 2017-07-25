@@ -109,7 +109,21 @@ final class User implements ProjectionInterface, AdvancedUserInterface
 
     private function whenUserWasLoggedIn(UserWasLoggedIn $userWasLoggedIn)
     {
-        die('login');
+        $tokens = [];
+        foreach ($this->getTokens() as $token) {
+            if ($userWasLoggedIn->getAuthTokenId()->toNative() === $token['id']) {
+                $token['expiresAt'] = $userWasLoggedIn->getAuthTokenExpiresAt()->toNative();
+            }
+            $tokens[] = $token;
+        }
+
+        return self::fromArray(array_merge(
+            $this->state,
+            [
+                'aggregateRevision' => $userWasLoggedIn->getAggregateRevision()->toNative(),
+                'tokens' => $tokens
+            ]
+        ));
     }
 
     public function getRoles(): array
