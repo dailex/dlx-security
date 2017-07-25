@@ -3,7 +3,9 @@
 namespace Dlx\Security\Service;
 
 use Daikon\Config\ConfigProviderInterface;
+use Daikon\Entity\ValueObject\Timestamp;
 use Daikon\MessageBus\MessageBusInterface;
+use Dlx\Security\User\Domain\Command\LoginUser;
 use Dlx\Security\User\Domain\Command\RegisterUser;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
@@ -36,33 +38,36 @@ final class UserManager
 
     public function registerUser(array $values, $role = null): void
     {
-        if (isset($values['password'])) {
-            $values['password_hash'] = $this->passwordEncoder->encodePassword($values['password'], null);
-            unset($values['password']);
-        }
+        $aggregateId = sprintf(
+            'dlx.security.user-%s-%s-1',
+            Uuid::uuid4()->toString(),
+            $values['locale'] ?? $this->translator->getLocale()
+        );
 
-        if (!isset($values['locale'])) {
-            $values['locale'] = $this->translator->getLocale();
-        }
+        $registerUser = RegisterUser::fromArray([
+            'aggregateId' => $aggregateId,
+            'username' => $values['username'],
+            'email' => $values['email'],
+            'role' => $values['role'] ?? $this->getDefaultRole(),
+            'firstname' => $values['firstname'],
+            'lastname' => $values['lastname'],
+            'locale' => $values['locale'] ?? $this->translator->getLocale(),
+            'passwordHash' => $this->passwordEncoder->encodePassword($values['password'], null),
+            'authTokenExpiresAt' => gmdate(Timestamp::NATIVE_FORMAT, strtotime('+1 month'))
+        ]);
 
-        if (!isset($values['role'])) {
-            $values['role'] = $this->getDefaultRole();
-        }
-
-        if (!isset($values['aggregateId'])) {
-            $values['aggregateId'] = sprintf(
-                'dlx.security.user-%s-%s-1',
-                Uuid::uuid4()->toString(),
-                $values['locale']
-            );
-        }
-
-        $registerUser = RegisterUser::fromArray($values);
         $this->messageBus->publish($registerUser, 'commands');
     }
 
     public function loginUser(AdvancedUserInterface $user): void
     {
+        $loginUser = LoginUser::fromArray([
+            'aggregateId' => $user->getAggregateId(),
+            'authTokenId' => $user->getToken('auth_token')['id'],
+            'authTokenExpiresAt' => gmdate(Timestamp::NATIVE_FORMAT, strtotime('+1 month'))
+        ]);
+
+        $this->messageBus->publish($loginUser, 'commands');
     }
 
     public function getDefaultRole()

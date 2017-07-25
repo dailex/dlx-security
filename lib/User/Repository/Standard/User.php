@@ -6,6 +6,7 @@ use Daikon\ReadModel\Projection\ProjectionInterface;
 use Daikon\ReadModel\Projection\ProjectionTrait;
 use Dlx\Security\User\Domain\Entity\AuthToken\AuthToken;
 use Dlx\Security\User\Domain\Event\AuthTokenWasAdded;
+use Dlx\Security\User\Domain\Event\UserWasLoggedIn;
 use Dlx\Security\User\Domain\Event\UserWasRegistered;
 use Dlx\Security\User\Domain\Event\UserWasUpdated;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
@@ -31,7 +32,7 @@ final class User implements ProjectionInterface, AdvancedUserInterface
 
     public function getPasswordHash(): string
     {
-        return $this->state['password_hash'];
+        return $this->state['passwordHash'];
     }
 
     public function getFirstname(): string
@@ -67,7 +68,7 @@ final class User implements ProjectionInterface, AdvancedUserInterface
                 'firstname' => $userWasRegistered->getFirstname()->toNative(),
                 'lastname' => $userWasRegistered->getLastname()->toNative(),
                 'locale' => $userWasRegistered->getLocale()->toNative(),
-                'password_hash' => $userWasRegistered->getPasswordHash()->toNative(),
+                'passwordHash' => $userWasRegistered->getPasswordHash()->toNative(),
                 'state' => $userWasRegistered->getState()->toNative()
             ]
         ));
@@ -85,7 +86,7 @@ final class User implements ProjectionInterface, AdvancedUserInterface
                 'firstname' => $userWasUpdated->getFirstname()->toNative(),
                 'lastname' => $userWasUpdated->getLastname()->toNative(),
                 'locale' => $userWasUpdated->getLocale()->toNative(),
-                'password_hash' => $userWasUpdated->getPasswordHash()->toNative()
+                'passwordHash' => $userWasUpdated->getPasswordHash()->toNative()
             ]
         ));
     }
@@ -99,11 +100,16 @@ final class User implements ProjectionInterface, AdvancedUserInterface
                 'tokens' => [[
                     'id' => $tokenWasAdded->getId()->toNative(),
                     'token' => $tokenWasAdded->getToken()->toNative(),
-                    'expires_at' => $tokenWasAdded->getExpiresAt()->toNative(),
-                    '@type' => AuthToken::class
+                    'expiresAt' => $tokenWasAdded->getExpiresAt()->toNative(),
+                    '@type' => 'auth_token'
                 ]]
             ]
         ));
+    }
+
+    private function whenUserWasLoggedIn(UserWasLoggedIn $userWasLoggedIn)
+    {
+        die('login');
     }
 
     public function getRoles(): array
@@ -114,6 +120,15 @@ final class User implements ProjectionInterface, AdvancedUserInterface
     public function getTokens(): array
     {
         return $this->state['tokens'];
+    }
+
+    public function getToken(string $type)
+    {
+        foreach ($this->getTokens() as $token) {
+            if ($type === $token['@type']) {
+                return $token;
+            }
+        }
     }
 
     public function getPassword(): string
@@ -161,7 +176,7 @@ final class User implements ProjectionInterface, AdvancedUserInterface
 
     public function isVerified()
     {
-        $this->state['state'] === 'verified';
+        $this->state['state'] === 'activated';
     }
 
     public function getSalt()

@@ -2,7 +2,6 @@
 
 namespace Dlx\Security\User\Domain\Event;
 
-use Assert\Assertion;
 use Daikon\Entity\ValueObject\Timestamp;
 use Daikon\Entity\ValueObject\Uuid;
 use Daikon\EventSourcing\Aggregate\AggregateId;
@@ -11,27 +10,21 @@ use Daikon\EventSourcing\Aggregate\Command\CommandInterface;
 use Daikon\EventSourcing\Aggregate\Event\DomainEvent;
 use Daikon\EventSourcing\Aggregate\Event\DomainEventInterface;
 use Daikon\MessageBus\MessageInterface;
-use Dlx\Security\User\Domain\Command\RegisterUser;
+use Dlx\Security\User\Domain\Command\LoginUser;
 use Dlx\Security\User\Domain\User;
-use Dlx\Security\User\Domain\ValueObject\RandomToken;
 
-final class AuthTokenWasAdded extends DomainEvent
+final class UserWasLoggedIn extends DomainEvent
 {
-    private $id;
+    private $authTokenId;
 
-    private $token;
+    private $authTokenExpiresAt;
 
-    private $expiresAt;
-
-    public static function viaCommand(CommandInterface $registerUser): self
+    public static function viaCommand(LoginUser $loginUser): self
     {
-        Assertion::isInstanceOf($registerUser, RegisterUser::class);
-
         return new self(
-            $registerUser->getAggregateId(),
-            Uuid::generate(),
-            RandomToken::generate(),
-            $registerUser->getAuthTokenExpiresAt()
+            $loginUser->getAggregateId(),
+            $loginUser->getAuthTokenId(),
+            $loginUser->getAuthTokenExpiresAt()
         );
     }
 
@@ -39,9 +32,9 @@ final class AuthTokenWasAdded extends DomainEvent
     {
         return new self(
             AggregateId::fromNative($nativeArray['aggregateId']),
-            Uuid::fromNative($nativeArray['id']),
-            RandomToken::fromNative($nativeArray['token']),
-            Timestamp::fromNative($nativeArray['expiresAt'])
+            Uuid::fromNative($nativeArray['authTokenId']),
+            Timestamp::fromNative($nativeArray['authTokenExpiresAt']),
+            AggregateRevision::fromNative($nativeArray['aggregateRevision'])
         );
     }
 
@@ -55,40 +48,32 @@ final class AuthTokenWasAdded extends DomainEvent
         return false;
     }
 
-    public function getId(): Uuid
+    public function getAuthTokenId(): Uuid
     {
-        return $this->id;
+        return $this->authTokenId;
     }
 
-    public function getToken(): RandomToken
+    public function getAuthTokenExpiresAt(): Timestamp
     {
-        return $this->token;
-    }
-
-    public function getExpiresAt(): Timestamp
-    {
-        return $this->expiresAt;
+        return $this->authTokenExpiresAt;
     }
 
     public function toArray(): array
     {
         return array_merge([
-            'id' => $this->id->toNative(),
-            'token' => $this->token->toNative(),
-            'expiresAt' => $this->expiresAt->toNative()
+            'authTokenId' => $this->authTokenId->toNative(),
+            'authTokenExpiresAt' => $this->authTokenExpiresAt->toNative()
         ], parent::toArray());
     }
 
     protected function __construct(
         AggregateId $aggregateId,
-        Uuid $id,
-        RandomToken $token,
-        Timestamp $expiresAt,
+        Uuid $authTokenId,
+        Timestamp $authTokenExpiresAt,
         AggregateRevision $aggregateRevision = null
     ) {
         parent::__construct($aggregateId, $aggregateRevision);
-        $this->id = $id;
-        $this->token = $token;
-        $this->expiresAt = $expiresAt;
+        $this->authTokenId = $authTokenId;
+        $this->authTokenExpiresAt = $authTokenExpiresAt;
     }
 }

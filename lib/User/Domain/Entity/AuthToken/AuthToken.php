@@ -27,6 +27,6 @@ final class AuthToken extends NestedEntity
 
     public function getExpiresAt(): Timestamp
     {
-        return $this->get('expires_at');
+        return $this->get('expiresAt');
     }
 }

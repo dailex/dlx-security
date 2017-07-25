@@ -84,6 +84,8 @@ final class UserProvider implements UserProviderInterface, OAuthUserProviderInte
 
     public function refreshUser(UserInterface $user)
     {
+        //@todo proper refresh
+        return $user;
     }
 
     public function supportsClass($class)

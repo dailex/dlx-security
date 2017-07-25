@@ -44,7 +44,7 @@
                 }
             }
         },
-        "password_hash": {
+        "passwordHash": {
             "type": "keyword",
             "index": false
         },
@@ -63,7 +63,7 @@
                 "token": {
                     "type": "keyword"
                 },
-                "expires_at": {
+                "expiresAt": {
                     "type": "date"
                 }
             }

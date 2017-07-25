@@ -17,7 +17,7 @@ final class AuthTokenType extends EntityType
         parent::__construct('AuthToken', [
             Attribute::define('id', Uuid::class, $this),
             Attribute::define('token', RandomToken::class, $this),
-            Attribute::define('expires_at', Timestamp::class, $this)
+            Attribute::define('expiresAt', Timestamp::class, $this)
         ], $parentAttribute);
     }
 

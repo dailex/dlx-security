@@ -56,12 +56,12 @@ final class UserEntity extends Entity
 
     public function getPasswordHash(): Text
     {
-        return $this->get('password_hash');
+        return $this->get('passwordHash');
     }
 
     public function withPasswordHash(Text $passwordHash): self
     {
-        return $this->withValue('password_hash', $passwordHash);
+        return $this->withValue('passwordHash', $passwordHash);
     }
 
     public function getFirstname(): Text
@@ -109,9 +109,13 @@ final class UserEntity extends Entity
         return $this->get('tokens');
     }
 
-    public function withAuthTokenAdded(array $tokenPayload): self
+    public function withAuthTokenAdded(array $payload): self
     {
-        return $this->addToken($tokenPayload, "auth_token");
+        return $this->addToken($payload, 'auth_token');
+    }
+
+    public function withUserLoggedIn(array $payload): self
+    {
     }
 
     private function addToken(array $tokenPayload, string $type): self

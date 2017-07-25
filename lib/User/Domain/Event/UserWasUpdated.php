@@ -105,9 +105,9 @@ final class UserWasUpdated extends DomainEvent
         Text $firstname,
         Text $lastname,
         Text $locale,
-        AggregateRevision $revision = null
+        AggregateRevision $aggregateRevision = null
     ) {
-        parent::__construct($aggregateId, $revision);
+        parent::__construct($aggregateId, $aggregateRevision);
         $this->username = $username;
         $this->email = $email;
         $this->firstname = $firstname;

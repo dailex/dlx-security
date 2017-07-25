@@ -99,7 +99,7 @@ final class FormLoginAuthenticator extends AbstractFormLoginAuthenticator
         return new RedirectResponse($targetPath);
     }
 
-    private function getLoginUrl()
+    protected function getLoginUrl()
     {
         return $this->urlGenerator->generate('dlx.security.login');
     }

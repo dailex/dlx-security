@@ -5,10 +5,12 @@ namespace Dlx\Security\User\Domain;
 use Daikon\EventSourcing\Aggregate\AggregateAlias;
 use Daikon\EventSourcing\Aggregate\AggregateRootInterface;
 use Daikon\EventSourcing\Aggregate\AggregateRootTrait;
+use Dlx\Security\User\Domain\Command\LoginUser;
 use Dlx\Security\User\Domain\Command\RegisterUser;
 use Dlx\Security\User\Domain\Command\UpdateUser;
 use Dlx\Security\User\Domain\Entity\UserEntityType;
 use Dlx\Security\User\Domain\Event\AuthTokenWasAdded;
+use Dlx\Security\User\Domain\Event\UserWasLoggedIn;
 use Dlx\Security\User\Domain\Event\UserWasRegistered;
 use Dlx\Security\User\Domain\Event\UserWasUpdated;
 
@@ -28,6 +30,11 @@ final class User implements AggregateRootInterface
         return (new self($registerUser->getAggregateId()))
             ->reflectThat(UserWasRegistered::viaCommand($registerUser))
             ->reflectThat(AuthTokenWasAdded::viaCommand($registerUser));
+    }
+
+    public function login(LoginUser $loginUser): self
+    {
+        return $this->reflectThat(UserWasLoggedIn::viaCommand($loginUser));
     }
 
     public function update(UpdateUser $updateUser): self
@@ -52,7 +59,15 @@ final class User implements AggregateRootInterface
         $this->userState = $this->userState->withAuthTokenAdded([
             'id' => $tokenWasAdded->getId(),
             'token' => $tokenWasAdded->getToken(),
-            'expires_at' => $tokenWasAdded->getExpiresAt()
+            'expiresAt' => $tokenWasAdded->getExpiresAt()
+        ]);
+    }
+
+    private function whenUserWasLoggedIn(UserWasLoggedIn $userWasLoggedIn)
+    {
+        $this->userState = $this->userState->withUserLoggedIn([
+            'id' => $userWasLoggedIn->getAuthTokenId(),
+            'expiresAt' => $userWasLoggedIn->getAuthTokenExpiresAt()
         ]);
     }
 }

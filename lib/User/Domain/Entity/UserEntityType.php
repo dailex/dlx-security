@@ -25,7 +25,7 @@ final class UserEntityType extends EntityType
             Attribute::define('firstname', Text::class, $this),
             Attribute::define('lastname', Text::class, $this),
             Attribute::define('locale', Text::class, $this),
-            Attribute::define('password_hash', Text::class, $this),
+            Attribute::define('passwordHash', Text::class, $this),
             Attribute::define('state', UserState::class, $this),
             NestedEntityListAttribute::define('tokens', [
                 AuthTokenType::class

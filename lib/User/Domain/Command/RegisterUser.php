@@ -4,6 +4,7 @@ namespace Dlx\Security\User\Domain\Command;
 
 use Daikon\Entity\ValueObject\Email;
 use Daikon\Entity\ValueObject\Text;
+use Daikon\Entity\ValueObject\Timestamp;
 use Daikon\EventSourcing\Aggregate\AggregateId;
 use Daikon\EventSourcing\Aggregate\AggregateIdInterface;
 use Daikon\EventSourcing\Aggregate\Command\Command;
@@ -27,6 +28,8 @@ final class RegisterUser extends Command
 
     private $passwordHash;
 
+    private $authTokenExpiresAt;
+
     public static function getAggregateRootClass(): string
     {
         return User::class;
@@ -42,7 +45,8 @@ final class RegisterUser extends Command
             Text::fromNative($nativeValues['firstname']),
             Text::fromNative($nativeValues['lastname']),
             Text::fromNative($nativeValues['locale']),
-            Text::fromNative($nativeValues['password_hash'])
+            Text::fromNative($nativeValues['passwordHash']),
+            Timestamp::fromNative($nativeValues['authTokenExpiresAt'])
         );
     }
 
@@ -81,6 +85,11 @@ final class RegisterUser extends Command
         return $this->passwordHash;
     }
 
+    public function getAuthTokenExpiresAt(): Timestamp
+    {
+        return $this->authTokenExpiresAt;
+    }
+
     public function toArray(): array
     {
         return array_merge(
@@ -92,7 +101,8 @@ final class RegisterUser extends Command
                 'firstname' => $this->firstname->toNative(),
                 'lastname' => $this->lastname->toNative(),
                 'locale' => $this->locale->toNative(),
-                'password_hash' => $this->passwordHash->toNative()
+                'passwordHash' => $this->passwordHash->toNative(),
+                'authTokenExpiresAt' => $this->authTokenExpiresAt->toNative()
             ]
         );
     }
@@ -105,7 +115,8 @@ final class RegisterUser extends Command
         Text $firstname,
         Text $lastname,
         Text $locale,
-        Text $passwordHash
+        Text $passwordHash,
+        Timestamp $authTokenExpiresAt
     ) {
         parent::__construct($aggregateId);
         $this->username = $username;
@@ -115,5 +126,6 @@ final class RegisterUser extends Command
         $this->lastname = $lastname;
         $this->locale = $locale;
         $this->passwordHash = $passwordHash;
+        $this->authTokenExpiresAt = $authTokenExpiresAt;
     }
 }

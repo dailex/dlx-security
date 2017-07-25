@@ -13,7 +13,6 @@ final class UserState implements ValueObjectInterface
 
     private const STATES = [
         'unverified',
-        'verified',
         'activated',
         'deactivated',
         'deleted'
