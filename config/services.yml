@@ -1,49 +1,43 @@
 dlx.security:
   user_provider:
     class: Dlx\Security\Service\UserProvider
-    provisioner:
-      class: Dlx\Security\Service\Provisioner\UserProviderProvisioner
+    provisioner: Dlx\Security\Service\Provisioner\UserProviderProvisioner
 
   user_manager:
     class: Dlx\Security\Service\UserManager
-    provisioner:
-      class: Dailex\Service\Provisioner\DefaultProvisioner
+    provisioner: Dailex\Service\Provisioner\DefaultProvisioner
 
   password_encoder:
     class: Symfony\Component\Security\Core\Encoder\BCryptPasswordEncoder
-    provisioner:
-      class: Dailex\Service\Provisioner\SilexServiceProvisioner
-      settings:
-        app_key: security.encoder.bcrypt
-        alias: Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface
+    provisioner: Dailex\Service\Provisioner\SilexServiceProvisioner
+    settings:
+      _app_key: security.encoder.bcrypt
+      _alias: Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface
 
   token_storage:
     class: Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage
-    provisioner:
-      class: Dailex\Service\Provisioner\SilexServiceProvisioner
-      settings:
-        app_key: security.token_storage
-        alias: Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface
+    provisioner: Dailex\Service\Provisioner\SilexServiceProvisioner
+    settings:
+      _app_key: security.token_storage
+      _alias: Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface
 
   authorization_checker:
     class: Symfony\Component\Security\Core\Authorization\AuthorizationChecker
-    provisioner:
-      class: Dailex\Service\Provisioner\SilexServiceProvisioner
-      settings:
-        app_key: security.authorization_checker
-        alias: Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface
+    provisioner: Dailex\Service\Provisioner\SilexServiceProvisioner
+    settings:
+      _app_key: security.authorization_checker
+      _alias: Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface
 
   user_mail_service:
     class: Dlx\Security\Service\UserMailService
-    provisioner:
-      class: Dailex\Service\Provisioner\DefaultProvisioner
-      settings:
-        from_email: ${project.mailer.from_email}
-        from_name: ${project.mailer.from_name}
-        sender_email: ${project.mailer.sender_email}
-        sender_name: ${project.mailer.sender_name}
-        reply_email: ${project.mailer.reply_email}
-        reply_name: ${project.mailer.reply_name}
+    provisioner: Dailex\Service\Provisioner\DefaultProvisioner
+    settings:
+      from_email: ${project.mailer.from_email}
+      from_name: ${project.mailer.from_name}
+      sender_email: ${project.mailer.sender_email}
+      sender_name: ${project.mailer.sender_name}
+      reply_email: ${project.mailer.reply_email}
+      reply_name: ${project.mailer.reply_name}
     subscriptions:
       events_sub:
         channel: events
