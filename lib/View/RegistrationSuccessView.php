@@ -24,8 +24,8 @@ final class RegistrationSuccessView
 
     public function renderHtml(Request $request, Application $app)
     {
-        $targetPath = $this->configProvider->get('dlx.security.auto_login.enabled') && $request->hasSession()
-            ? $this->configProvider->get('dlx.security.auto_login.target_path', 'home')
+        $targetPath = $this->configProvider->get('crates.dlx.security.auto_login.enabled') && $request->hasSession()
+            ? $this->configProvider->get('crates.dlx.security.auto_login.target_path', 'home')
             : 'dlx.security.login';
 
         return $app->redirect($this->urlGenerator->generate($targetPath));

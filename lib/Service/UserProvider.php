@@ -3,6 +3,7 @@
 namespace Dlx\Security\Service;
 
 use Daikon\Elasticsearch5\Query\Elasticsearch5Query;
+use Daikon\ReadModel\Repository\RepositoryInterface;
 use Daikon\ReadModel\Repository\RepositoryMap;
 use Dlx\Security\User\Repository\Standard\User;
 use Gigablah\Silex\OAuth\Security\Authentication\Token\OAuthTokenInterface;
@@ -31,7 +32,7 @@ final class UserProvider implements UserProviderInterface, OAuthUserProviderInte
         $this->tokenStorage = $tokenStorage;
     }
 
-    public function loadUserByIdentifier($identifier)
+    public function loadUserByIdentifier(string $identifier): User
     {
         $user = $this->getUserRepository()->findById($identifier);
 
@@ -42,7 +43,7 @@ final class UserProvider implements UserProviderInterface, OAuthUserProviderInte
         return $user;
     }
 
-    public function loadUserByUsername($username)
+    public function loadUserByUsername($username): User
     {
         $users = $this->getUserRepository()->search(new Elasticsearch5Query([
             'query' => [
@@ -56,36 +57,50 @@ final class UserProvider implements UserProviderInterface, OAuthUserProviderInte
             ]
         ]), 0, 2);
 
-        if (1 !== $users->count()) {
+        if ($users->count() !== 1) {
             throw new UsernameNotFoundException;
         }
 
         return $users->getIterator()->current();
     }
 
-    public function loadUserByToken($token, $type)
+    public function loadUserByToken($token, $type): User
     {
     }
 
-    public function loadUserByEmail($email)
+    public function loadUserByEmail(string $email): User
+    {
+        $users = $this->getUserRepository()->search(new Elasticsearch5Query([
+            'query' => [
+                'term' => ['email' => $email]
+            ]
+        ]), 0, 2);
+
+        if ($users->count() !== 1) {
+            throw new UsernameNotFoundException;
+        }
+
+        return $users->getIterator()->current();
+    }
+
+    public function loadUserByOAuthCredentials(OAuthTokenInterface $token): User
     {
     }
 
-    public function loadUserByOAuthCredentials(OAuthTokenInterface $token)
-    {
-    }
-
-    public function userExists($username, $email, array $ignoreIds = [])
+    public function userExists(string $username, string $email, array $ignoreIds = []): bool
     {
         $users = $this->getUserRepository()->search(new Elasticsearch5Query, 0, 1);
 
         return $users->count() > 0;
     }
 
-    public function refreshUser(UserInterface $user)
+    public function refreshUser(UserInterface $user): User
     {
-        //@todo proper refresh
-        return $user;
+        if (!$this->supportsClass(get_class($user))) {
+            throw new UnsupportedUserException;
+        }
+
+        return $this->loadUserByIdentifier($user->getAggregateId());
     }
 
     public function supportsClass($class)
@@ -93,7 +108,7 @@ final class UserProvider implements UserProviderInterface, OAuthUserProviderInte
         return User::class === $class;
     }
 
-    private function getUserRepository()
+    private function getUserRepository(): RepositoryInterface
     {
         return $this->repostitoryMap->get('dlx.security.user.standard');
     }

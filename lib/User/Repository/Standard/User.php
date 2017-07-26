@@ -73,7 +73,7 @@ final class User implements ProjectionInterface, AdvancedUserInterface
                 'firstname' => $userWasRegistered->getFirstname()
                     ? $userWasRegistered->getFirstname()->toNative() : null,
                 'lastname' => $userWasRegistered->getLastname()
-                    ? $userWasRegistered->getFirstname()->toNative() : null,
+                    ? $userWasRegistered->getLastname()->toNative() : null,
             ]
         ));
     }

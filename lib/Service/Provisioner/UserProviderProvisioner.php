@@ -59,7 +59,7 @@ class UserProviderProvisioner implements ProvisionerInterface, EventListenerProv
                     'anonymous' => true,
                     'users' => $userProviderDelegate
                ]
-           ],
+            ],
             $crateSettings['firewalls'] ?? []
         );
 
@@ -156,29 +156,29 @@ class UserProviderProvisioner implements ProvisionerInterface, EventListenerProv
     }
 
 
-    protected function registerLogoutHandler(Container $app, Injector $injector)
+    private function registerLogoutHandler(Container $app, Injector $injector)
     {
         // logout handler - 'default' matching firewall name
         $app['security.authentication.logout_handler.default'] = function ($app) use ($injector) {
-            return $injector->share(UserLogoutListener::CLASS)->make(
+            return $injector->share(UserLogoutListener::class)->make(
                 UserLogoutListener::CLASS,
                 [':targetUrl' => $app['security.firewalls']['default']['logout']['target_url']]
             );
         };
     }
 
-    protected function registerLoginHandler(Container $app, Injector $injector)
+    private function registerLoginHandler(Container $app, Injector $injector)
     {
         // 'default' matching firewall name
         $app['security.authentication.success_handler.default'] = function ($app) use ($injector) {
-            return $injector->share(UserLoginListener::CLASS)->make(
-                UserLoginListener::CLASS,
+            return $injector->share(UserLoginListener::class)->make(
+                UserLoginListener::class,
                 [':options' => $app['security.firewalls']['default']['form']]
             );
         };
     }
 
-    protected function registerSecurityVoters(Container $app, Injector $injector, array $voterSettings = [])
+    private function registerSecurityVoters(Container $app, Injector $injector, array $voterSettings = [])
     {
         $app['security.voters'] = $app->extend('security.voters', function ($voters) use ($injector, $voterSettings) {
             foreach ($voterSettings as $voter) {
@@ -188,7 +188,7 @@ class UserProviderProvisioner implements ProvisionerInterface, EventListenerProv
         });
     }
 
-    protected function registerAuthenticators(Container $app, Injector $injector, array $authenticatorSettings = [])
+    private function registerAuthenticators(Container $app, Injector $injector, array $authenticatorSettings = [])
     {
         foreach ($authenticatorSettings as $name => $authenticator) {
             $app[$name] = function () use ($injector, $authenticator) {
@@ -200,7 +200,7 @@ class UserProviderProvisioner implements ProvisionerInterface, EventListenerProv
     /*
      * Overriding default to support Dailex user token validation within cookie auto login flow
      */
-    protected function registerRememberMeServices(Container $app)
+    private function registerRememberMeServices(Container $app)
     {
         $app['security.remember_me.service._proto'] = $app->protect(function ($providerKey, $options) use ($app) {
             return function () use ($providerKey, $options, $app) {

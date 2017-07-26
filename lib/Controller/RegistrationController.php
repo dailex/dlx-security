@@ -74,8 +74,8 @@ final class RegistrationController
             if (!$this->userProvider->userExists($username, $email)) {
                 $this->userManager->registerUser($formData);
                 // auto login handling - expects registration to be synchronous
-                if ($this->configProvider->get('dlx.security.auto_login.enabled') && $request->hasSession()) {
-                    $firewall = $this->configProvider->get('dlx.security.auto_login.firewall', 'default');
+                if ($this->configProvider->get('crates.dlx.security.auto_login.enabled') && $request->hasSession()) {
+                    $firewall = $this->configProvider->get('crates.dlx.security.auto_login.firewall', 'default');
                     $user = $this->userProvider->loadUserByEmail($email);
                     $token = new UsernamePasswordToken($user, null, $firewall, $user->getRoles());
                     $this->tokenStorage->setToken($token);
