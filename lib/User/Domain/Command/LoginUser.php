@@ -42,11 +42,11 @@ final class LoginUser extends Command
     public function toArray(): array
     {
         return array_merge(
-            parent::toArray(),
             [
                 'authTokenId' => $this->authTokenId->toNative(),
                 'authTokenExpiresAt' => $this->authTokenExpiresAt->toNative()
-            ]
+            ],
+            parent::toArray()
         );
     }
 

@@ -64,7 +64,7 @@ final class UserEntity extends Entity
         return $this->withValue('passwordHash', $passwordHash);
     }
 
-    public function getFirstname(): Text
+    public function getFirstname(): ?Text
     {
         return $this->get('firstname');
     }
@@ -74,7 +74,7 @@ final class UserEntity extends Entity
         return $this->withValue('firstname', $firstname);
     }
 
-    public function getLastname(): Text
+    public function getLastname(): ?Text
     {
         return $this->get('lastname');
     }
@@ -112,6 +112,11 @@ final class UserEntity extends Entity
     public function withAuthTokenAdded(array $payload): self
     {
         return $this->addToken($payload, 'auth_token');
+    }
+
+    public function withVerifyTokenAdded(array $payload): self
+    {
+        return $this->addToken($payload, 'verify_token');
     }
 
     public function withUserLoggedIn(array $payload): self

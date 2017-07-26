@@ -22,15 +22,15 @@ final class UserWasRegistered extends DomainEvent
 
     private $role;
 
-    private $firstname;
-
-    private $lastname;
-
     private $locale;
 
     private $passwordHash;
 
     private $state;
+
+    private $firstname;
+
+    private $lastname;
 
     public static function getAggregateRootClass(): string
     {
@@ -44,11 +44,11 @@ final class UserWasRegistered extends DomainEvent
             $registerUser->getUsername(),
             $registerUser->getEmail(),
             $registerUser->getRole(),
-            $registerUser->getFirstname(),
-            $registerUser->getLastname(),
             $registerUser->getLocale(),
             $registerUser->getPasswordHash(),
-            UserState::fromNative(UserState::INITIAL)
+            UserState::fromNative(UserState::INITIAL),
+            $registerUser->getFirstname(),
+            $registerUser->getLastname()
         );
     }
 
@@ -59,11 +59,11 @@ final class UserWasRegistered extends DomainEvent
             Text::fromNative($nativeValues['username']),
             Email::fromNative($nativeValues['email']),
             UserRole::fromNative($nativeValues['role']),
-            Text::fromNative($nativeValues['firstname']),
-            Text::fromNative($nativeValues['lastname']),
             Text::fromNative($nativeValues['locale']),
             Text::fromNative($nativeValues['password_hash']),
             UserState::fromNative($nativeValues['state']),
+            array_key_exists('firstname', $nativeValues) ? Text::fromNative($nativeValues['firstname']) : null,
+            array_key_exists('lastname', $nativeValues) ? Text::fromNative($nativeValues['lastname']) : null,
             AggregateRevision::fromNative($nativeValues['aggregateRevision'])
         );
     }
@@ -88,16 +88,6 @@ final class UserWasRegistered extends DomainEvent
         return $this->role;
     }
 
-    public function getFirstname(): Text
-    {
-        return $this->firstname;
-    }
-
-    public function getLastname(): Text
-    {
-        return $this->lastname;
-    }
-
     public function getLocale(): Text
     {
         return $this->locale;
@@ -113,18 +103,40 @@ final class UserWasRegistered extends DomainEvent
         return $this->state;
     }
 
+    public function getFirstname(): ?Text
+    {
+        return $this->firstname;
+    }
+
+    public function getLastname(): ?Text
+    {
+        return $this->lastname;
+    }
+
     public function toArray(): array
     {
-        return array_merge([
+        $mandatoryValues = [
             'username' => $this->username->toNative(),
             'email' => $this->email->toNative(),
             'role' => $this->role->toNative(),
-            'firstname' => $this->firstname->toNative(),
-            'lastname' => $this->lastname->toNative(),
             'locale' => $this->locale->toNative(),
             'password_hash' => $this->passwordHash->toNative(),
             'state' => $this->state->toNative()
-        ], parent::toArray());
+        ];
+
+        $optionalValues = [];
+        if (!is_null($this->firstname)) {
+            $optionalValues['firstname'] = $this->firstname->toNative();
+        }
+        if (!is_null($this->lastname)) {
+            $optionalValues['lastname'] = $this->lastname->toNative();
+        }
+
+        return array_merge(
+            $mandatoryValues,
+            $optionalValues,
+            parent::toArray()
+        );
     }
 
     protected function __construct(
@@ -132,21 +144,21 @@ final class UserWasRegistered extends DomainEvent
         Text $username,
         Email $email,
         UserRole $role,
-        Text $firstname,
-        Text $lastname,
         Text $locale,
         Text $passwordHash,
         UserState $state,
+        Text $firstname = null,
+        Text $lastname = null,
         AggregateRevision $revision = null
     ) {
         parent::__construct($aggregateId, $revision);
         $this->username = $username;
         $this->email = $email;
         $this->role = $role;
-        $this->firstname = $firstname;
-        $this->lastname = $lastname;
         $this->locale = $locale;
         $this->passwordHash = $passwordHash;
         $this->state = $state;
+        $this->firstname = $firstname;
+        $this->lastname = $lastname;
     }
 }

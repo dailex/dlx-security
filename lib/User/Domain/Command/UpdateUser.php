@@ -67,14 +67,14 @@ final class UpdateUser extends Command
     public function toArray(): array
     {
         return array_merge(
-            parent::toArray(),
             [
                 'username' => $this->username->toNative(),
                 'email' => $this->email->toNative(),
                 'firstname' => $this->firstname->toNative(),
                 'lastname' => $this->lastname->toNative(),
                 'locale' => $this->locale->toNative()
-            ]
+            ],
+            parent::toArray()
         );
     }
 

@@ -15,6 +15,7 @@ use Dlx\Security\User\Domain\Event\UserWasLoggedIn;
 use Dlx\Security\User\Domain\Event\UserWasLoggedOut;
 use Dlx\Security\User\Domain\Event\UserWasRegistered;
 use Dlx\Security\User\Domain\Event\UserWasUpdated;
+use Dlx\Security\User\Domain\Event\VerifyTokenWasAdded;
 
 final class User implements AggregateRootInterface
 {
@@ -31,7 +32,8 @@ final class User implements AggregateRootInterface
     {
         return (new self($registerUser->getAggregateId()))
             ->reflectThat(UserWasRegistered::viaCommand($registerUser))
-            ->reflectThat(AuthTokenWasAdded::viaCommand($registerUser));
+            ->reflectThat(AuthTokenWasAdded::viaCommand($registerUser))
+            ->reflectThat(VerifyTokenWasAdded::viaCommand($registerUser));
     }
 
     public function login(LoginUser $loginUser): self
@@ -49,19 +51,24 @@ final class User implements AggregateRootInterface
         return $this->reflectThat(UserWasUpdated::viaCommand($updateUser));
     }
 
-    private function whenUserWasRegistered(UserWasRegistered $userWasRegistered)
+    private function whenUserWasRegistered(UserWasRegistered $userWasRegistered): void
     {
         $this->userState = (new UserEntityType)->makeEntity()
             ->withUsername($userWasRegistered->getUsername())
             ->withEmail($userWasRegistered->getEmail())
             ->withRole($userWasRegistered->getRole())
             ->withPasswordHash($userWasRegistered->getPasswordHash())
-            ->withFirstname($userWasRegistered->getFirstname())
-            ->withLastname($userWasRegistered->getLastname())
             ->withLocale($userWasRegistered->getLocale());
+
+        if ($firstname = $userWasRegistered->getFirstname()) {
+            $this->userState = $this->userState->withFirstname($firstname);
+        }
+        if ($lastname = $userWasRegistered->getLastname()) {
+            $this->userState = $this->userState->withLastname($lastname);
+        }
     }
 
-    private function whenAuthTokenWasAdded(AuthTokenWasAdded $tokenWasAdded)
+    private function whenAuthTokenWasAdded(AuthTokenWasAdded $tokenWasAdded): void
     {
         $this->userState = $this->userState->withAuthTokenAdded([
             'id' => $tokenWasAdded->getId(),
@@ -70,7 +77,15 @@ final class User implements AggregateRootInterface
         ]);
     }
 
-    private function whenUserWasLoggedIn(UserWasLoggedIn $userWasLoggedIn)
+    private function whenVerifyTokenWasAdded(VerifyTokenWasAdded $tokenWasAdded): void
+    {
+        $this->userState = $this->userState->withVerifyTokenAdded([
+            'id' => $tokenWasAdded->getId(),
+            'token' => $tokenWasAdded->getToken()
+        ]);
+    }
+
+    private function whenUserWasLoggedIn(UserWasLoggedIn $userWasLoggedIn): void
     {
         $this->userState = $this->userState->withUserLoggedIn([
             'id' => $userWasLoggedIn->getAuthTokenId(),
@@ -78,7 +93,7 @@ final class User implements AggregateRootInterface
         ]);
     }
 
-    private function whenUserWasLoggedOut(UserWasLoggedOut $userWasLoggedOut)
+    private function whenUserWasLoggedOut(UserWasLoggedOut $userWasLoggedOut): void
     {
         $this->userState = $this->userState->withUserLoggedOut([
             'id' => $userWasLoggedOut->getAuthTokenId(),

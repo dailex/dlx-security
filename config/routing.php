@@ -13,6 +13,7 @@ $app->mount($mount, function ($app) use ($cratePrefix) {
     $app->match('/authenticate', [LoginController::class, 'write'])->bind($cratePrefix.'.authenticate');
     $app->get('/registration', [RegistrationController::class, 'read'])->bind($cratePrefix.'.registration');
     $app->post('/registration', [RegistrationController::class, 'write']);
+    $app->get('/verify', [RegistrationController::class, 'verify'])->bind($cratePrefix.'.verify');
     require_once __DIR__.'/User/routing.php';
 });
 

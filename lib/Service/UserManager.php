@@ -50,11 +50,11 @@ final class UserManager
             'username' => $values['username'],
             'email' => $values['email'],
             'role' => $values['role'] ?? $this->getDefaultRole(),
-            'firstname' => $values['firstname'],
-            'lastname' => $values['lastname'],
             'locale' => $values['locale'] ?? $this->translator->getLocale(),
             'passwordHash' => $this->passwordEncoder->encodePassword($values['password'], null),
-            'authTokenExpiresAt' => gmdate(Timestamp::NATIVE_FORMAT, strtotime('+1 month'))
+            'authTokenExpiresAt' => gmdate(Timestamp::NATIVE_FORMAT, strtotime('+1 month')),
+            'firstname' => $values['firstname'] ?? null,
+            'lastname' => $values['lastname'] ?? null,
         ]);
 
         $this->messageBus->publish($registerUser, 'commands');

@@ -20,15 +20,15 @@ final class RegisterUser extends Command
 
     private $role;
 
-    private $firstname;
-
-    private $lastname;
-
     private $locale;
 
     private $passwordHash;
 
     private $authTokenExpiresAt;
+
+    private $firstname;
+
+    private $lastname;
 
     public static function getAggregateRootClass(): string
     {
@@ -42,11 +42,11 @@ final class RegisterUser extends Command
             Text::fromNative($nativeValues['username']),
             Email::fromNative($nativeValues['email']),
             UserRole::fromNative($nativeValues['role']),
-            Text::fromNative($nativeValues['firstname']),
-            Text::fromNative($nativeValues['lastname']),
             Text::fromNative($nativeValues['locale']),
             Text::fromNative($nativeValues['passwordHash']),
-            Timestamp::fromNative($nativeValues['authTokenExpiresAt'])
+            Timestamp::fromNative($nativeValues['authTokenExpiresAt']),
+            array_key_exists('firstname', $nativeValues) ? Text::fromNative($nativeValues['firstname']) : null,
+            array_key_exists('lastname', $nativeValues) ? Text::fromNative($nativeValues['lastname']) : null
         );
     }
 
@@ -65,16 +65,6 @@ final class RegisterUser extends Command
         return $this->role;
     }
 
-    public function getFirstname(): Text
-    {
-        return $this->firstname;
-    }
-
-    public function getLastname(): Text
-    {
-        return $this->lastname;
-    }
-
     public function getLocale(): Text
     {
         return $this->locale;
@@ -90,20 +80,39 @@ final class RegisterUser extends Command
         return $this->authTokenExpiresAt;
     }
 
+    public function getFirstname(): ?Text
+    {
+        return $this->firstname;
+    }
+
+    public function getLastname(): ?Text
+    {
+        return $this->lastname;
+    }
+
     public function toArray(): array
     {
+        $mandatoryValues = [
+            'username' => $this->username->toNative(),
+            'email' => $this->email->toNative(),
+            'role' => $this->role->toNative(),
+            'locale' => $this->locale->toNative(),
+            'passwordHash' => $this->passwordHash->toNative(),
+            'authTokenExpiresAt' => $this->authTokenExpiresAt->toNative()
+        ];
+
+        $optionalValues = [];
+        if (!is_null($this->firstname)) {
+            $optionalValues['firstname'] = $this->firstname->toNative();
+        }
+        if (!is_null($this->lastname)) {
+            $optionalValues['lastname'] = $this->lastname->toNative();
+        }
+
         return array_merge(
-            parent::toArray(),
-            [
-                'username' => $this->username->toNative(),
-                'email' => $this->email->toNative(),
-                'role' => $this->role->toNative(),
-                'firstname' => $this->firstname->toNative(),
-                'lastname' => $this->lastname->toNative(),
-                'locale' => $this->locale->toNative(),
-                'passwordHash' => $this->passwordHash->toNative(),
-                'authTokenExpiresAt' => $this->authTokenExpiresAt->toNative()
-            ]
+            $mandatoryValues,
+            $optionalValues,
+            parent::toArray()
         );
     }
 
@@ -112,20 +121,20 @@ final class RegisterUser extends Command
         Text $username,
         Email $email,
         UserRole $role,
-        Text $firstname,
-        Text $lastname,
         Text $locale,
         Text $passwordHash,
-        Timestamp $authTokenExpiresAt
+        Timestamp $authTokenExpiresAt,
+        Text $firstname = null,
+        Text $lastname = null
     ) {
         parent::__construct($aggregateId);
         $this->username = $username;
         $this->email = $email;
         $this->role = $role;
-        $this->firstname = $firstname;
-        $this->lastname = $lastname;
         $this->locale = $locale;
         $this->passwordHash = $passwordHash;
         $this->authTokenExpiresAt = $authTokenExpiresAt;
+        $this->firstname = $firstname;
+        $this->lastname = $lastname;
     }
 }

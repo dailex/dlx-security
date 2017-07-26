@@ -2,7 +2,6 @@
 
 namespace Dlx\Security\EventListener;
 
-use Dailex\Exception\RuntimeException;
 use Dlx\Security\Service\UserManager;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -40,7 +39,7 @@ final class UserLogoutListener implements LogoutSuccessHandlerInterface
             $user = $token->getUser();
             try {
                 $this->userManager->logoutUser($user);
-            } catch (RuntimeException $error) {
+            } catch (\Exception $error) {
             }
         }
 

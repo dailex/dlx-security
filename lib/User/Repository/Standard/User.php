@@ -10,6 +10,7 @@ use Dlx\Security\User\Domain\Event\UserWasLoggedIn;
 use Dlx\Security\User\Domain\Event\UserWasLoggedOut;
 use Dlx\Security\User\Domain\Event\UserWasRegistered;
 use Dlx\Security\User\Domain\Event\UserWasUpdated;
+use Dlx\Security\User\Domain\Event\VerifyTokenWasAdded;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 
 final class User implements ProjectionInterface, AdvancedUserInterface
@@ -36,16 +37,6 @@ final class User implements ProjectionInterface, AdvancedUserInterface
         return $this->state['passwordHash'];
     }
 
-    public function getFirstname(): string
-    {
-        return $this->state['firstname'];
-    }
-
-    public function getLastname(): string
-    {
-        return $this->state['lastname'];
-    }
-
     public function getLocale(): string
     {
         return $this->state['locale'];
@@ -54,6 +45,16 @@ final class User implements ProjectionInterface, AdvancedUserInterface
     public function getState(): string
     {
         return $this->state['state'];
+    }
+
+    public function getFirstname(): ?string
+    {
+        return $this->state['firstname'] ?? null;
+    }
+
+    public function getLastname(): ?string
+    {
+        return $this->state['lastname'] ?? null;
     }
 
     private function whenUserWasRegistered(UserWasRegistered $userWasRegistered)
@@ -66,11 +67,13 @@ final class User implements ProjectionInterface, AdvancedUserInterface
                 'username' => $userWasRegistered->getUsername()->toNative(),
                 'email' => $userWasRegistered->getEmail()->toNative(),
                 'role' => $userWasRegistered->getRole()->toNative(),
-                'firstname' => $userWasRegistered->getFirstname()->toNative(),
-                'lastname' => $userWasRegistered->getLastname()->toNative(),
                 'locale' => $userWasRegistered->getLocale()->toNative(),
                 'passwordHash' => $userWasRegistered->getPasswordHash()->toNative(),
-                'state' => $userWasRegistered->getState()->toNative()
+                'state' => $userWasRegistered->getState()->toNative(),
+                'firstname' => $userWasRegistered->getFirstname()
+                    ? $userWasRegistered->getFirstname()->toNative() : null,
+                'lastname' => $userWasRegistered->getLastname()
+                    ? $userWasRegistered->getFirstname()->toNative() : null,
             ]
         ));
     }
@@ -108,8 +111,27 @@ final class User implements ProjectionInterface, AdvancedUserInterface
         ));
     }
 
+    private function whenVerifyTokenWasAdded(VerifyTokenWasAdded $tokenWasAdded)
+    {
+        //@todo better token merging
+        return self::fromArray(array_merge_recursive(
+            array_merge(
+                $this->state,
+                ['aggregateRevision' => $tokenWasAdded->getAggregateRevision()->toNative()]
+            ),
+            [
+                'tokens' => [[
+                    'id' => $tokenWasAdded->getId()->toNative(),
+                    'token' => $tokenWasAdded->getToken()->toNative(),
+                    '@type' => 'verify_token'
+                ]]
+            ]
+        ));
+    }
+
     private function whenUserWasLoggedIn(UserWasLoggedIn $userWasLoggedIn)
     {
+        //@todo better token updating
         $tokens = [];
         foreach ($this->getTokens() as $token) {
             if ($userWasLoggedIn->getAuthTokenId()->toNative() === $token['id']) {
