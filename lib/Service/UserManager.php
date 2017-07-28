@@ -5,6 +5,7 @@ namespace Dlx\Security\Service;
 use Daikon\Config\ConfigProviderInterface;
 use Daikon\Entity\ValueObject\Timestamp;
 use Daikon\MessageBus\MessageBusInterface;
+use Dlx\Security\User\Domain\Command\ActivateUser;
 use Dlx\Security\User\Domain\Command\LoginUser;
 use Dlx\Security\User\Domain\Command\LogoutUser;
 use Dlx\Security\User\Domain\Command\RegisterUser;
@@ -79,6 +80,21 @@ final class UserManager
         ]);
 
         $this->messageBus->publish($logoutUser, 'commands');
+    }
+
+    public function activateUser(AdvancedUserInterface $user)
+    {
+        $this->guardUserStatus($user);
+
+        if ($user->isActivated()) {
+            return;
+        }
+
+        $activateUser = ActivateUser::fromArray([
+            'aggregateId' => $user->getAggregateId()
+        ]);
+
+        $this->messageBus->publish($activateUser, 'commands');
     }
 
     public function getDefaultRole()

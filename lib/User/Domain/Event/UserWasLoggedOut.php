@@ -32,14 +32,14 @@ final class UserWasLoggedOut extends DomainEvent
         );
     }
 
-    public static function fromArray(array $nativeArray): MessageInterface
+    public static function fromArray(array $nativeValues): MessageInterface
     {
         return new self(
-            AggregateId::fromNative($nativeArray['aggregateId']),
-            Uuid::fromNative($nativeArray['authTokenId']),
-            RandomToken::fromNative($nativeArray['authToken']),
-            Timestamp::fromNative($nativeArray['authTokenExpiresAt']),
-            AggregateRevision::fromNative($nativeArray['aggregateRevision'])
+            AggregateId::fromNative($nativeValues['aggregateId']),
+            Uuid::fromNative($nativeValues['authTokenId']),
+            RandomToken::fromNative($nativeValues['authToken']),
+            Timestamp::fromNative($nativeValues['authTokenExpiresAt']),
+            AggregateRevision::fromNative($nativeValues['aggregateRevision'])
         );
     }
 

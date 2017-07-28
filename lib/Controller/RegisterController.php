@@ -4,8 +4,8 @@ namespace Dlx\Security\Controller;
 
 use Daikon\Config\ConfigProviderInterface;
 use Dlx\Security\Service\UserManager;
-use Dlx\Security\View\RegistrationInputView;
-use Dlx\Security\View\RegistrationSuccessView;
+use Dlx\Security\View\RegisterInputView;
+use Dlx\Security\View\RegisterSuccessView;
 use Silex\Application;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\FormType;
@@ -22,7 +22,7 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 
-final class RegistrationController
+final class RegisterController
 {
     private $formFactory;
 
@@ -53,7 +53,7 @@ final class RegistrationController
         $form = $this->buildForm();
         $request->attributes->set('form', $form);
 
-        return [RegistrationInputView::class];
+        return [RegisterInputView::class];
     }
 
     public function write(Request $request, Application $app)
@@ -63,7 +63,7 @@ final class RegistrationController
         $request->attributes->set('form', $form);
 
         if (!$form->isValid()) {
-            return [RegistrationInputView::class];
+            return [RegisterInputView::class];
         }
 
         $formData = $form->getData();
@@ -81,14 +81,23 @@ final class RegistrationController
                     $this->tokenStorage->setToken($token);
                     $request->getSession()->set('_security_'.$firewall, serialize($token));
                 }
-                return [RegistrationSuccessView::class];
+                return [RegisterSuccessView::class];
             }
         } catch (AuthenticationException $error) {
             $errors = (array)$error->getMessageKey();
         }
 
         $request->attributes->set('errors', $errors ?? ['User is already registered.']);
-        return [RegistrationInputView::class];
+        return [RegisterInputView::class];
+    }
+
+    public function activate(Request $request, Application $app)
+    {
+        $token = $request->get('token');
+        $user = $this->userProvider->loadUserByToken($token, 'verify_token');
+        $this->userManager->activateUser($user);
+
+        return [RegisterSuccessView::class];
     }
 
     private function buildForm()

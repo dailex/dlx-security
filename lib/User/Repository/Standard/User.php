@@ -6,11 +6,12 @@ use Daikon\ReadModel\Projection\ProjectionInterface;
 use Daikon\ReadModel\Projection\ProjectionTrait;
 use Dlx\Security\User\Domain\Entity\AuthToken\AuthToken;
 use Dlx\Security\User\Domain\Event\AuthTokenWasAdded;
+use Dlx\Security\User\Domain\Event\UserWasActivated;
 use Dlx\Security\User\Domain\Event\UserWasLoggedIn;
 use Dlx\Security\User\Domain\Event\UserWasLoggedOut;
 use Dlx\Security\User\Domain\Event\UserWasRegistered;
-use Dlx\Security\User\Domain\Event\UserWasUpdated;
 use Dlx\Security\User\Domain\Event\VerifyTokenWasAdded;
+use Dlx\Security\User\Domain\Event\VerifyTokenWasRemoved;
 use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 
 final class User implements ProjectionInterface, AdvancedUserInterface
@@ -78,19 +79,13 @@ final class User implements ProjectionInterface, AdvancedUserInterface
         ));
     }
 
-    private function whenUserWasUpdated(UserWasUpdated $userWasUpdated)
+    private function whenUserWasActivated(UserWasActivated $userWasActivated)
     {
         return self::fromArray(array_merge(
             $this->state,
             [
-                'aggregateRevision' => $userWasUpdated->getAggregateRevision()->toNative(),
-                'username' => $userWasUpdated->getUsername()->toNative(),
-                'email' => $userWasUpdated->getEmail()->toNative(),
-                'role' => $userWasUpdated->getRole()->toNative(),
-                'firstname' => $userWasUpdated->getFirstname()->toNative(),
-                'lastname' => $userWasUpdated->getLastname()->toNative(),
-                'locale' => $userWasUpdated->getLocale()->toNative(),
-                'passwordHash' => $userWasUpdated->getPasswordHash()->toNative()
+                'aggregateRevision' => $userWasActivated->getAggregateRevision()->toNative(),
+                'state' => $userWasActivated->getState()->toNative()
             ]
         ));
     }
@@ -125,6 +120,23 @@ final class User implements ProjectionInterface, AdvancedUserInterface
                     'token' => $tokenWasAdded->getToken()->toNative(),
                     '@type' => 'verify_token'
                 ]]
+            ]
+        ));
+    }
+
+    private function whenVerifyTokenWasRemoved(VerifyTokenWasRemoved $tokenWasRemoved)
+    {
+        $tokens = [];
+        foreach ($this->getTokens() as $token) {
+            if (!$token['@type'] === 'verify_token') {
+                $tokens[] = $token;
+            }
+        }
+        return self::fromArray(array_merge(
+            $this->state,
+            [
+                'aggregateRevision' => $tokenWasRemoved->getAggregateRevision()->toNative(),
+                'tokens' => $tokens
             ]
         ));
     }
@@ -231,7 +243,7 @@ final class User implements ProjectionInterface, AdvancedUserInterface
         return $this->state['state'] !== 'deactivated';
     }
 
-    public function isVerified()
+    public function isActivated()
     {
         $this->state['state'] === 'activated';
     }

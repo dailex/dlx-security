@@ -49,7 +49,7 @@ final class UserMailService implements MessageHandlerInterface
     {
         $user = $this->loadUser($userWasRegistered->getAggregateId());
         $message = $this->createMessageFromTemplate(
-            'account_verification',
+            'account_activate',
             $user,
             [
                 'name' => $this->getName($user),

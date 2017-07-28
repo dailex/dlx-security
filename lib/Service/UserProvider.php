@@ -64,8 +64,20 @@ final class UserProvider implements UserProviderInterface, OAuthUserProviderInte
         return $users->getIterator()->current();
     }
 
-    public function loadUserByToken($token, $type): User
+    public function loadUserByToken(string $token, string $type): User
     {
+        //@todo check token type
+        $users = $this->getUserRepository()->search(new Elasticsearch5Query([
+            'query' => [
+                'term' => ['tokens.token' => $token]
+            ]
+        ]), 0, 2);
+
+        if ($users->count() !== 1) {
+            throw new UsernameNotFoundException;
+        }
+
+        return $users->getIterator()->current();
     }
 
     public function loadUserByEmail(string $email): User

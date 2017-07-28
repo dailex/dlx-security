@@ -3,4 +3,4 @@ Welcome {{ name }},
 Thank you for registering with {{ config('project.name') }}. Please follow the link provided
 to complete verification of your email address and activate your account.
 
-{{ url('dlx.security.verify', { token: token }) }}
+{{ url('dlx.security.activate', { token: token }) }}

@@ -2,29 +2,25 @@
 
 namespace Dlx\Security\User\Domain\Event;
 
-use Daikon\Entity\ValueObject\Uuid;
 use Daikon\EventSourcing\Aggregate\AggregateId;
 use Daikon\EventSourcing\Aggregate\AggregateRevision;
 use Daikon\EventSourcing\Aggregate\Command\CommandInterface;
 use Daikon\EventSourcing\Aggregate\Event\DomainEvent;
 use Daikon\EventSourcing\Aggregate\Event\DomainEventInterface;
 use Daikon\MessageBus\MessageInterface;
-use Dlx\Security\User\Domain\Command\RegisterUser;
+use Dlx\Security\User\Domain\Command\ActivateUser;
 use Dlx\Security\User\Domain\User;
-use Dlx\Security\User\Domain\ValueObject\RandomToken;
+use Dlx\Security\User\Domain\ValueObject\UserState;
 
-final class VerifyTokenWasAdded extends DomainEvent
+final class UserWasActivated extends DomainEvent
 {
-    private $id;
+    private $state;
 
-    private $token;
-
-    public static function viaCommand(RegisterUser $registerUser): self
+    public static function viaCommand(ActivateUser $activateUser): self
     {
         return new self(
-            $registerUser->getAggregateId(),
-            Uuid::generate(),
-            RandomToken::generate()
+            $activateUser->getAggregateId(),
+            $activateUser->getState()
         );
     }
 
@@ -32,8 +28,7 @@ final class VerifyTokenWasAdded extends DomainEvent
     {
         return new self(
             AggregateId::fromNative($nativeValues['aggregateId']),
-            Uuid::fromNative($nativeValues['id']),
-            RandomToken::fromNative($nativeValues['token']),
+            UserState::fromNative($nativeValues['state']),
             AggregateRevision::fromNative($nativeValues['aggregateRevision'])
         );
     }
@@ -48,32 +43,24 @@ final class VerifyTokenWasAdded extends DomainEvent
         return false;
     }
 
-    public function getId(): Uuid
+    public function getState(): UserState
     {
-        return $this->id;
-    }
-
-    public function getToken(): RandomToken
-    {
-        return $this->token;
+        return $this->state;
     }
 
     public function toArray(): array
     {
         return array_merge([
-            'id' => $this->id->toNative(),
-            'token' => $this->token->toNative()
+            'state' => $this->state->toNative()
         ], parent::toArray());
     }
 
     protected function __construct(
         AggregateId $aggregateId,
-        Uuid $id,
-        RandomToken $token,
+        UserState $state,
         AggregateRevision $aggregateRevision = null
     ) {
         parent::__construct($aggregateId, $aggregateRevision);
-        $this->id = $id;
-        $this->token = $token;
+        $this->state = $state;
     }
 }

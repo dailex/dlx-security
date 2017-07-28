@@ -8,16 +8,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Translation\TranslatorInterface;
 
-final class RegistrationInputView
+final class RegisterInputView
 {
     private $templateRenderer;
 
     private $translator;
 
-    public function __construct(
-        TemplateRendererInterface $templateRenderer,
-        TranslatorInterface $translator
-    ) {
+    public function __construct(TemplateRendererInterface $templateRenderer, TranslatorInterface $translator)
+    {
         $this->templateRenderer = $templateRenderer;
         $this->translator = $translator;
     }
@@ -28,7 +26,7 @@ final class RegistrationInputView
         $errors = $request->attributes->get('errors');
 
         return $this->templateRenderer->render(
-            '@dlx.security/registration.html.twig',
+            '@dlx.security/register.html.twig',
             ['form' => $form->createView(), 'errors' => $errors]
         );
     }

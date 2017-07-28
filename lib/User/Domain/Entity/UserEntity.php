@@ -9,6 +9,7 @@ use Daikon\Entity\ValueObject\Text;
 use Daikon\Entity\ValueObject\Uuid;
 use Daikon\Entity\ValueObject\ValueObjectInterface;
 use Daikon\EventSourcing\Aggregate\AggregateId;
+use Dlx\Security\User\Domain\Entity\VerifyToken\VerifyToken;
 use Dlx\Security\User\Domain\ValueObject\UserRole;
 use Dlx\Security\User\Domain\ValueObject\UserState;
 
@@ -119,6 +120,17 @@ final class UserEntity extends Entity
         return $this->addToken($payload, 'verify_token');
     }
 
+    public function withVerifyTokenRemoved(): self
+    {
+        $tokens = [];
+        foreach ($this->getTokens() as $token) {
+            if (!$token instanceof VerifyToken) {
+                $tokens[] = $token;
+            }
+        }
+        return $this->withValue('tokens', new NestedEntityList($tokens));
+    }
+
     public function withUserLoggedIn(array $payload): self
     {
         $tokens = [];
@@ -143,6 +155,11 @@ final class UserEntity extends Entity
             $tokens[] = $token;
         }
         return $this->withValue('tokens', new NestedEntityList($tokens));
+    }
+
+    public function withUserActivated(array $payload)
+    {
+        return $this->withState($payload['state']);
     }
 
     private function addToken(array $tokenPayload, string $type): self

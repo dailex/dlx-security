@@ -8,16 +8,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-final class RegistrationSuccessView
+final class RegisterSuccessView
 {
     private $configProvider;
 
     private $urlGenerator;
 
-    public function __construct(
-        ConfigProviderInterface $configProvider,
-        UrlGeneratorInterface $urlGenerator
-    ) {
+    public function __construct(ConfigProviderInterface $configProvider, UrlGeneratorInterface $urlGenerator)
+    {
         $this->configProvider = $configProvider;
         $this->urlGenerator = $urlGenerator;
     }

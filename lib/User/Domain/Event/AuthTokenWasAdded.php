@@ -35,14 +35,14 @@ final class AuthTokenWasAdded extends DomainEvent
         );
     }
 
-    public static function fromArray(array $nativeArray): MessageInterface
+    public static function fromArray(array $nativeValues): MessageInterface
     {
         return new self(
-            AggregateId::fromNative($nativeArray['aggregateId']),
-            Uuid::fromNative($nativeArray['id']),
-            RandomToken::fromNative($nativeArray['token']),
-            Timestamp::fromNative($nativeArray['expiresAt']),
-            AggregateRevision::fromNative($nativeArray['aggregateRevision'])
+            AggregateId::fromNative($nativeValues['aggregateId']),
+            Uuid::fromNative($nativeValues['id']),
+            RandomToken::fromNative($nativeValues['token']),
+            Timestamp::fromNative($nativeValues['expiresAt']),
+            AggregateRevision::fromNative($nativeValues['aggregateRevision'])
         );
     }
 

@@ -5,6 +5,7 @@ namespace Dlx\Security\User\Domain;
 use Daikon\EventSourcing\Aggregate\AggregateAlias;
 use Daikon\EventSourcing\Aggregate\AggregateRootInterface;
 use Daikon\EventSourcing\Aggregate\AggregateRootTrait;
+use Dlx\Security\User\Domain\Command\ActivateUser;
 use Dlx\Security\User\Domain\Command\LoginUser;
 use Dlx\Security\User\Domain\Command\LogoutUser;
 use Dlx\Security\User\Domain\Command\RegisterUser;
@@ -13,9 +14,11 @@ use Dlx\Security\User\Domain\Entity\UserEntityType;
 use Dlx\Security\User\Domain\Event\AuthTokenWasAdded;
 use Dlx\Security\User\Domain\Event\UserWasLoggedIn;
 use Dlx\Security\User\Domain\Event\UserWasLoggedOut;
+use Dlx\Security\User\Domain\Event\UserWasActivated;
 use Dlx\Security\User\Domain\Event\UserWasRegistered;
 use Dlx\Security\User\Domain\Event\UserWasUpdated;
 use Dlx\Security\User\Domain\Event\VerifyTokenWasAdded;
+use Dlx\Security\User\Domain\Event\VerifyTokenWasRemoved;
 
 final class User implements AggregateRootInterface
 {
@@ -46,9 +49,10 @@ final class User implements AggregateRootInterface
         return $this->reflectThat(UserWasLoggedOut::viaCommand($logoutUser));
     }
 
-    public function update(UpdateUser $updateUser): self
+    public function activate(ActivateUser $activateUser): self
     {
-        return $this->reflectThat(UserWasUpdated::viaCommand($updateUser));
+        return $this->reflectThat(UserWasActivated::viaCommand($activateUser));
+//         ->reflectThat(VerifyTokenWasRemoved::viaCommand($activateUser));
     }
 
     private function whenUserWasRegistered(UserWasRegistered $userWasRegistered): void
@@ -68,6 +72,13 @@ final class User implements AggregateRootInterface
         }
     }
 
+    private function whenUserWasActivated(UserWasActivated $userWasActivated): void
+    {
+        $this->userState = $this->userState->withUserActivated([
+            'state' => $userWasActivated->getState()
+        ]);
+    }
+
     private function whenAuthTokenWasAdded(AuthTokenWasAdded $tokenWasAdded): void
     {
         $this->userState = $this->userState->withAuthTokenAdded([
@@ -83,6 +94,11 @@ final class User implements AggregateRootInterface
             'id' => $tokenWasAdded->getId(),
             'token' => $tokenWasAdded->getToken()
         ]);
+    }
+
+    private function whenVerifyTokenWasRemoved(VerifyTokenWasRemoved $tokenWasRemoved): void
+    {
+        $this->userState = $this->userState->withVerifyTokenRemoved();
     }
 
     private function whenUserWasLoggedIn(UserWasLoggedIn $userWasLoggedIn): void
