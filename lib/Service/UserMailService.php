@@ -10,6 +10,7 @@ use Dailex\Mailer\MailInterface;
 use Dailex\Mailer\MailerServiceInterface;
 use Dailex\Mailer\Message;
 use Dailex\Renderer\TemplateRendererInterface;
+use Dlx\Security\User\Domain\Entity\VerifyToken\VerifyTokenType;
 use Dlx\Security\User\Domain\Event\UserWasRegistered;
 use Dlx\Security\User\Repository\DailexUserInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -54,7 +55,7 @@ final class UserMailService implements MessageHandlerInterface
             $user,
             [
                 'name' => $user->getUsername(),
-                'token' => $user->getToken('verify_token')['token']
+                'token' => $user->getToken(VerifyTokenType::getName())['token']
             ]
         );
 

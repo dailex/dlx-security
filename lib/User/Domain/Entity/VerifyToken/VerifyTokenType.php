@@ -11,9 +11,14 @@ use Dlx\Security\User\Domain\ValueObject\RandomToken;
 
 final class VerifyTokenType extends EntityType
 {
+    public static function getName(): string
+    {
+        return 'VerifyToken';
+    }
+
     public function __construct(AttributeInterface $parentAttribute)
     {
-        parent::__construct('VerifyToken', [
+        parent::__construct([
             Attribute::define('id', Uuid::class, $this),
             Attribute::define('token', RandomToken::class, $this)
         ], $parentAttribute);
@@ -23,6 +28,6 @@ final class VerifyTokenType extends EntityType
     {
         $tokenState['@type'] = $this;
         $tokenState['@parent'] = $parent;
-        return VerifyToken::fromArray($tokenState);
+        return VerifyToken::fromNative($tokenState);
     }
 }

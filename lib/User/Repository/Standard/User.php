@@ -4,6 +4,8 @@ namespace Dlx\Security\User\Repository\Standard;
 
 use Daikon\ReadModel\Projection\ProjectionTrait;
 use Dlx\Security\User\Domain\Entity\AuthToken\AuthToken;
+use Dlx\Security\User\Domain\Entity\AuthToken\AuthTokenType;
+use Dlx\Security\User\Domain\Entity\VerifyToken\VerifyTokenType;
 use Dlx\Security\User\Domain\Event\AuthTokenWasAdded;
 use Dlx\Security\User\Domain\Event\UserWasActivated;
 use Dlx\Security\User\Domain\Event\UserWasLoggedIn;
@@ -140,7 +142,7 @@ final class User implements DailexUserInterface
                     'id' => $tokenWasAdded->getId()->toNative(),
                     'token' => $tokenWasAdded->getToken()->toNative(),
                     'expiresAt' => $tokenWasAdded->getExpiresAt()->toNative(),
-                    '@type' => 'auth_token'
+                    '@type' => AuthTokenType::getName()
                 ]]
             ]
         ));
@@ -153,12 +155,12 @@ final class User implements DailexUserInterface
             array_merge(
                 $this->state,
                 ['aggregateRevision' => $tokenWasAdded->getAggregateRevision()->toNative()]
-                ),
+            ),
             [
                 'tokens' => [[
                     'id' => $tokenWasAdded->getId()->toNative(),
                     'token' => $tokenWasAdded->getToken()->toNative(),
-                    '@type' => 'verify_token'
+                    '@type' => VerifyTokenType::getName()
                 ]]
             ]
         ));
@@ -168,7 +170,7 @@ final class User implements DailexUserInterface
     {
         $tokens = [];
         foreach ($this->getTokens() as $token) {
-            if (!$token['@type'] === 'verify_token') {
+            if (!$token['@type'] === VerifyTokenType::getName()) {
                 $tokens[] = $token;
             }
         }

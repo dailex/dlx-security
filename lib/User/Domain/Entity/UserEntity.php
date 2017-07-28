@@ -9,7 +9,9 @@ use Daikon\Entity\ValueObject\Text;
 use Daikon\Entity\ValueObject\Uuid;
 use Daikon\Entity\ValueObject\ValueObjectInterface;
 use Daikon\EventSourcing\Aggregate\AggregateId;
+use Dlx\Security\User\Domain\Entity\AuthToken\AuthTokenType;
 use Dlx\Security\User\Domain\Entity\VerifyToken\VerifyToken;
+use Dlx\Security\User\Domain\Entity\VerifyToken\VerifyTokenType;
 use Dlx\Security\User\Domain\ValueObject\UserRole;
 use Dlx\Security\User\Domain\ValueObject\UserState;
 
@@ -87,17 +89,17 @@ final class UserEntity extends Entity
 
     public function getTokens(): NestedEntityList
     {
-        return $this->get('tokens');
+        return $this->get('tokens') ?? NestedEntityList::makeEmpty();
     }
 
     public function withAuthTokenAdded(array $payload): self
     {
-        return $this->addToken($payload, 'auth_token');
+        return $this->addToken($payload, AuthTokenType::getName());
     }
 
     public function withVerifyTokenAdded(array $payload): self
     {
-        return $this->addToken($payload, 'verify_token');
+        return $this->addToken($payload, VerifyTokenType::getName());
     }
 
     public function withVerifyTokenRemoved(): self
@@ -108,7 +110,7 @@ final class UserEntity extends Entity
                 $tokens[] = $token;
             }
         }
-        return $this->withValue('tokens', new NestedEntityList($tokens));
+        return $this->withValue('tokens', NestedEntityList::wrap($tokens));
     }
 
     public function withUserLoggedIn(array $payload): self
@@ -120,7 +122,7 @@ final class UserEntity extends Entity
             }
             $tokens[] = $token;
         }
-        return $this->withValue('tokens', new NestedEntityList($tokens));
+        return $this->withValue('tokens', NestedEntityList::wrap($tokens));
     }
 
     public function withUserLoggedOut(array $payload): self
@@ -134,7 +136,7 @@ final class UserEntity extends Entity
             }
             $tokens[] = $token;
         }
-        return $this->withValue('tokens', new NestedEntityList($tokens));
+        return $this->withValue('tokens', NestedEntityList::wrap($tokens));
     }
 
     public function withUserActivated(array $payload)

@@ -4,6 +4,7 @@ namespace Dlx\Security\Controller;
 
 use Daikon\Config\ConfigProviderInterface;
 use Dlx\Security\Service\UserManager;
+use Dlx\Security\User\Domain\Entity\VerifyToken\VerifyTokenType;
 use Dlx\Security\View\RegisterInputView;
 use Dlx\Security\View\RegisterSuccessView;
 use Silex\Application;
@@ -94,7 +95,7 @@ final class RegisterController
     public function activate(Request $request, Application $app)
     {
         $token = $request->get('token');
-        $user = $this->userProvider->loadUserByToken($token, 'verify_token');
+        $user = $this->userProvider->loadUserByToken($token, VerifyTokenType::getName());
         $this->userManager->activateUser($user);
 
         return [RegisterSuccessView::class];

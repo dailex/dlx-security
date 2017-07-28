@@ -9,6 +9,7 @@ use Dlx\Security\User\Domain\Command\ActivateUser;
 use Dlx\Security\User\Domain\Command\LoginUser;
 use Dlx\Security\User\Domain\Command\LogoutUser;
 use Dlx\Security\User\Domain\Command\RegisterUser;
+use Dlx\Security\User\Domain\Entity\AuthToken\AuthTokenType;
 use Dlx\Security\User\Repository\DailexUserInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
@@ -61,9 +62,11 @@ final class UserManager
 
     public function loginUser(DailexUserInterface $user): void
     {
+        $this->guardUserStatus($user);
+
         $loginUser = LoginUser::fromArray([
             'aggregateId' => $user->getAggregateId(),
-            'authTokenId' => $user->getToken('auth_token')['id'],
+            'authTokenId' => $user->getToken(AuthTokenType::getName())['id'],
             'authTokenExpiresAt' => gmdate(Timestamp::NATIVE_FORMAT, strtotime('+1 month'))
         ]);
 
@@ -72,9 +75,11 @@ final class UserManager
 
     public function logoutUser(DailexUserInterface $user): void
     {
+        $this->guardUserStatus($user);
+
         $logoutUser = LogoutUser::fromArray([
             'aggregateId' => $user->getAggregateId(),
-            'authTokenId' => $user->getToken('auth_token')['id']
+            'authTokenId' => $user->getToken(AuthTokenType::getName())['id']
         ]);
 
         $this->messageBus->publish($logoutUser, 'commands');
@@ -83,10 +88,6 @@ final class UserManager
     public function activateUser(DailexUserInterface $user): void
     {
         $this->guardUserStatus($user);
-
-        if ($user->isEnabled()) {
-            return;
-        }
 
         $activateUser = ActivateUser::fromArray([
             'aggregateId' => $user->getAggregateId()
