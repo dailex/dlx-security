@@ -18,10 +18,6 @@ final class UserWasUpdated extends DomainEvent
 
     private $email;
 
-    private $firstname;
-
-    private $lastname;
-
     private $locale;
 
     public static function getAggregateRootClass(): string
@@ -35,8 +31,6 @@ final class UserWasUpdated extends DomainEvent
             AggregateId::fromNative($nativeValues['aggregateId']),
             Text::fromNative($nativeValues['username']),
             Email::fromNative($nativeValues['email']),
-            Text::fromNative($nativeValues['firstname']),
-            Text::fromNative($nativeValues['lastname']),
             Text::fromNative($nativeValues['locale']),
             AggregateRevision::fromNative($nativeValues['aggregateRevision'])
         );
@@ -48,8 +42,6 @@ final class UserWasUpdated extends DomainEvent
             $updateUser->getAggregateId(),
             $updateUser->getUsername(),
             $updateUser->getEmail(),
-            $updateUser->getFirstname(),
-            $updateUser->getLastname(),
             $updateUser->getLocale()
         );
     }
@@ -69,16 +61,6 @@ final class UserWasUpdated extends DomainEvent
         return $this->email;
     }
 
-    public function getFirstname(): Text
-    {
-        return $this->firstname;
-    }
-
-    public function getLastname(): Text
-    {
-        return $this->lastname;
-    }
-
     public function getLocale(): Text
     {
         return $this->locale;
@@ -91,8 +73,6 @@ final class UserWasUpdated extends DomainEvent
             [
                 'username' => $this->username->toNative(),
                 'email' => $this->email->toNative(),
-                'firstname' => $this->firstname->toNative(),
-                'lastname' => $this->lastname->toNative(),
                 'locale' => $this->locale->toNative()
             ]
         );
@@ -102,16 +82,12 @@ final class UserWasUpdated extends DomainEvent
         AggregateId $aggregateId,
         Text $username,
         Email $email,
-        Text $firstname,
-        Text $lastname,
         Text $locale,
         AggregateRevision $aggregateRevision = null
     ) {
         parent::__construct($aggregateId, $aggregateRevision);
         $this->username = $username;
         $this->email = $email;
-        $this->firstname = $firstname;
-        $this->lastname = $lastname;
         $this->locale = $locale;
     }
 }

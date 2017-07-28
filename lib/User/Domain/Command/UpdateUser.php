@@ -16,10 +16,6 @@ final class UpdateUser extends Command
 
     private $email;
 
-    private $firstname;
-
-    private $lastname;
-
     private $locale;
 
     public static function getAggregateRootClass(): string
@@ -33,8 +29,6 @@ final class UpdateUser extends Command
             AggregateId::fromNative($nativeValues['aggregateId']),
             Text::fromNative($nativeValues['username']),
             Email::fromNative($nativeValues['email']),
-            Text::fromNative($nativeValues['firstname']),
-            Text::fromNative($nativeValues['lastname']),
             Text::fromNative($nativeValues['locale'])
         );
     }
@@ -49,16 +43,6 @@ final class UpdateUser extends Command
         return $this->email;
     }
 
-    public function getFirstname(): Text
-    {
-        return $this->firstname;
-    }
-
-    public function getLastname(): Text
-    {
-        return $this->lastname;
-    }
-
     public function getLocale(): Text
     {
         return $this->locale;
@@ -70,8 +54,6 @@ final class UpdateUser extends Command
             [
                 'username' => $this->username->toNative(),
                 'email' => $this->email->toNative(),
-                'firstname' => $this->firstname->toNative(),
-                'lastname' => $this->lastname->toNative(),
                 'locale' => $this->locale->toNative()
             ],
             parent::toArray()
@@ -82,15 +64,11 @@ final class UpdateUser extends Command
         AggregateId $aggregateId,
         Text $username,
         Email $email,
-        Text $firstname,
-        Text $lastname,
         Text $locale
     ) {
         parent::__construct($aggregateId);
         $this->username = $username;
         $this->email = $email;
-        $this->firstname = $firstname;
-        $this->lastname = $lastname;
         $this->locale = $locale;
     }
 }

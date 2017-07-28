@@ -11,7 +11,7 @@ use Dailex\Mailer\MailerServiceInterface;
 use Dailex\Mailer\Message;
 use Dailex\Renderer\TemplateRendererInterface;
 use Dlx\Security\User\Domain\Event\UserWasRegistered;
-use Dlx\Security\User\Repository\Standard\User;
+use Dlx\Security\User\Repository\DailexUserInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 final class UserMailService implements MessageHandlerInterface
@@ -48,11 +48,12 @@ final class UserMailService implements MessageHandlerInterface
     private function whenUserWasRegistered(UserWasRegistered $userWasRegistered): bool
     {
         $user = $this->loadUser($userWasRegistered->getAggregateId());
+
         $message = $this->createMessageFromTemplate(
             'account_activate',
             $user,
             [
-                'name' => $this->getName($user),
+                'name' => $user->getUsername(),
                 'token' => $user->getToken('verify_token')['token']
             ]
         );
@@ -71,18 +72,12 @@ final class UserMailService implements MessageHandlerInterface
         return $result;
     }
 
-    private function getName(User $user)
-    {
-        $name = trim($user->getFirstname().' '.$user->getLastname());
-        return $name ?: $user->getUsername();
-    }
-
-    private function createMessageFromTemplate($template, User $user, array $templateVars = [])
+    private function createMessageFromTemplate(string $template, DailexUserInterface $user, array $templateVars = [])
     {
         $message = new Message;
 
         $message->setFrom([$this->settings['from_email'] => $this->settings['from_name'] ?? '']);
-        $message->setTo([$user->getEmail() => $this->getName($user)]);
+        $message->setTo([$user->getEmail() => $user->getUsername()]);
 
         if ($senderEmail = $this->settings['sender_email'] ?? null) {
             $message->setSender([$senderEmail => $this->settings['sender_name'] ?? '']);
@@ -102,12 +97,12 @@ final class UserMailService implements MessageHandlerInterface
         return $message;
     }
 
-    private function trans($key, User $user, array $params = [])
+    private function trans($key, DailexUserInterface $user, array $params = [])
     {
         return $this->translator->trans($key, $params, 'email', $user->getLocale());
     }
 
-    private function loadUser(string $identifier): User
+    private function loadUser(string $identifier): DailexUserInterface
     {
         return $this->repositoryMap->get('dlx.security.user.standard')->findById($identifier);
     }

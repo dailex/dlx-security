@@ -63,13 +63,6 @@ final class User implements AggregateRootInterface
             ->withRole($userWasRegistered->getRole())
             ->withPasswordHash($userWasRegistered->getPasswordHash())
             ->withLocale($userWasRegistered->getLocale());
-
-        if ($firstname = $userWasRegistered->getFirstname()) {
-            $this->userState = $this->userState->withFirstname($firstname);
-        }
-        if ($lastname = $userWasRegistered->getLastname()) {
-            $this->userState = $this->userState->withLastname($lastname);
-        }
     }
 
     private function whenUserWasActivated(UserWasActivated $userWasActivated): void

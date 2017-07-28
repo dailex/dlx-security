@@ -28,22 +28,6 @@
         "role": {
             "type": "keyword"
         },
-        "firstname": {
-            "type": "text",
-            "fields": {
-                "keyword": {
-                    "type": "keyword"
-                }
-            }
-        },
-        "lastname": {
-            "type": "text",
-            "fields": {
-                "keyword": {
-                    "type": "keyword"
-                }
-            }
-        },
         "passwordHash": {
             "type": "keyword",
             "index": false

@@ -9,11 +9,11 @@ use Dlx\Security\User\Domain\Command\ActivateUser;
 use Dlx\Security\User\Domain\Command\LoginUser;
 use Dlx\Security\User\Domain\Command\LogoutUser;
 use Dlx\Security\User\Domain\Command\RegisterUser;
+use Dlx\Security\User\Repository\DailexUserInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Exception\DisabledException;
 use Symfony\Component\Security\Core\Exception\LockedException;
-use Symfony\Component\Security\Core\User\AdvancedUserInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 final class UserManager
@@ -53,15 +53,13 @@ final class UserManager
             'role' => $values['role'] ?? $this->getDefaultRole(),
             'locale' => $values['locale'] ?? $this->translator->getLocale(),
             'passwordHash' => $this->passwordEncoder->encodePassword($values['password'], null),
-            'authTokenExpiresAt' => gmdate(Timestamp::NATIVE_FORMAT, strtotime('+1 month')),
-            'firstname' => $values['firstname'] ?? null,
-            'lastname' => $values['lastname'] ?? null,
+            'authTokenExpiresAt' => gmdate(Timestamp::NATIVE_FORMAT, strtotime('+1 month'))
         ]);
 
         $this->messageBus->publish($registerUser, 'commands');
     }
 
-    public function loginUser(AdvancedUserInterface $user): void
+    public function loginUser(DailexUserInterface $user): void
     {
         $loginUser = LoginUser::fromArray([
             'aggregateId' => $user->getAggregateId(),
@@ -72,7 +70,7 @@ final class UserManager
         $this->messageBus->publish($loginUser, 'commands');
     }
 
-    public function logoutUser(AdvancedUserInterface $user): void
+    public function logoutUser(DailexUserInterface $user): void
     {
         $logoutUser = LogoutUser::fromArray([
             'aggregateId' => $user->getAggregateId(),
@@ -82,11 +80,11 @@ final class UserManager
         $this->messageBus->publish($logoutUser, 'commands');
     }
 
-    public function activateUser(AdvancedUserInterface $user)
+    public function activateUser(DailexUserInterface $user): void
     {
         $this->guardUserStatus($user);
 
-        if ($user->isActivated()) {
+        if ($user->isEnabled()) {
             return;
         }
 
@@ -97,12 +95,7 @@ final class UserManager
         $this->messageBus->publish($activateUser, 'commands');
     }
 
-    public function getDefaultRole()
-    {
-        return $this->configProvider->get('dlx.security.roles.default_role', 'user');
-    }
-
-    public function getAvailableRoles()
+    private function getAvailableRoles(): array
     {
         return (array)$this->configProvider->get(
             'dlx.security.roles.available_roles',
@@ -110,7 +103,12 @@ final class UserManager
         );
     }
 
-    private function guardUserStatus(AdvancedUserInterface $user)
+    private function getDefaultRole(): string
+    {
+        return $this->configProvider->get('dlx.security.roles.default_role', 'user');
+    }
+
+    private function guardUserStatus(DailexUserInterface $user): void
     {
         if (!$user->isAccountNonLocked()) {
             throw new LockedException;

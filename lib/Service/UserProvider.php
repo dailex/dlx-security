@@ -5,7 +5,7 @@ namespace Dlx\Security\Service;
 use Daikon\Elasticsearch5\Query\Elasticsearch5Query;
 use Daikon\ReadModel\Repository\RepositoryInterface;
 use Daikon\ReadModel\Repository\RepositoryMap;
-use Dlx\Security\User\Repository\Standard\User;
+use Dlx\Security\User\Repository\DailexUserInterface;
 use Gigablah\Silex\OAuth\Security\Authentication\Token\OAuthTokenInterface;
 use Gigablah\Silex\OAuth\Security\User\Provider\OAuthUserProviderInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
@@ -32,7 +32,7 @@ final class UserProvider implements UserProviderInterface, OAuthUserProviderInte
         $this->tokenStorage = $tokenStorage;
     }
 
-    public function loadUserByIdentifier(string $identifier): User
+    public function loadUserByIdentifier(string $identifier): DailexUserInterface
     {
         $user = $this->getUserRepository()->findById($identifier);
 
@@ -43,7 +43,7 @@ final class UserProvider implements UserProviderInterface, OAuthUserProviderInte
         return $user;
     }
 
-    public function loadUserByUsername($username): User
+    public function loadUserByUsername($username): DailexUserInterface
     {
         $users = $this->getUserRepository()->search(new Elasticsearch5Query([
             'query' => [
@@ -64,7 +64,7 @@ final class UserProvider implements UserProviderInterface, OAuthUserProviderInte
         return $users->getIterator()->current();
     }
 
-    public function loadUserByToken(string $token, string $type): User
+    public function loadUserByToken(string $token, string $type): DailexUserInterface
     {
         //@todo check token type
         $users = $this->getUserRepository()->search(new Elasticsearch5Query([
@@ -80,7 +80,7 @@ final class UserProvider implements UserProviderInterface, OAuthUserProviderInte
         return $users->getIterator()->current();
     }
 
-    public function loadUserByEmail(string $email): User
+    public function loadUserByEmail(string $email): DailexUserInterface
     {
         $users = $this->getUserRepository()->search(new Elasticsearch5Query([
             'query' => [
@@ -95,7 +95,7 @@ final class UserProvider implements UserProviderInterface, OAuthUserProviderInte
         return $users->getIterator()->current();
     }
 
-    public function loadUserByOAuthCredentials(OAuthTokenInterface $token): User
+    public function loadUserByOAuthCredentials(OAuthTokenInterface $token): DailexUserInterface
     {
     }
 
@@ -106,7 +106,7 @@ final class UserProvider implements UserProviderInterface, OAuthUserProviderInte
         return $users->count() > 0;
     }
 
-    public function refreshUser(UserInterface $user): User
+    public function refreshUser(UserInterface $user): DailexUserInterface
     {
         if (!$this->supportsClass(get_class($user))) {
             throw new UnsupportedUserException;
@@ -117,7 +117,7 @@ final class UserProvider implements UserProviderInterface, OAuthUserProviderInte
 
     public function supportsClass($class)
     {
-        return User::class === $class;
+        return is_a($class, DailexUserInterface::class, true);
     }
 
     private function getUserRepository(): RepositoryInterface

@@ -29,9 +29,9 @@ final class ResourceController
         $userId = $request->get('userId');
         $user = $this->userProvider->loadUserByIdentifier($userId);
 
-//         if (!$this->authorizationChecker->isGranted([OwnershipVoter::PERMISSION_VIEW, 'ROLE_ADMIN'], $user)) {
-//             throw new AccessDeniedException;
-//         }
+        if (!$this->authorizationChecker->isGranted([OwnershipVoter::PERMISSION_VIEW, 'ROLE_ADMIN'], $user)) {
+            throw new AccessDeniedException;
+        }
 
         $request->attributes->set('user', $user);
 

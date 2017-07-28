@@ -2,7 +2,6 @@
 
 namespace Dlx\Security\User\Repository\Standard;
 
-use Daikon\ReadModel\Projection\ProjectionInterface;
 use Daikon\ReadModel\Projection\ProjectionTrait;
 use Dlx\Security\User\Domain\Entity\AuthToken\AuthToken;
 use Dlx\Security\User\Domain\Event\AuthTokenWasAdded;
@@ -12,9 +11,9 @@ use Dlx\Security\User\Domain\Event\UserWasLoggedOut;
 use Dlx\Security\User\Domain\Event\UserWasRegistered;
 use Dlx\Security\User\Domain\Event\VerifyTokenWasAdded;
 use Dlx\Security\User\Domain\Event\VerifyTokenWasRemoved;
-use Symfony\Component\Security\Core\User\AdvancedUserInterface;
+use Dlx\Security\User\Repository\DailexUserInterface;
 
-final class User implements ProjectionInterface, AdvancedUserInterface
+final class User implements DailexUserInterface
 {
     use ProjectionTrait;
 
@@ -28,37 +27,82 @@ final class User implements ProjectionInterface, AdvancedUserInterface
         return $this->state['email'];
     }
 
-    public function getRole(): string
-    {
-        return $this->state['role'];
-    }
-
-    public function getPasswordHash(): string
-    {
-        return $this->state['passwordHash'];
-    }
-
     public function getLocale(): string
     {
         return $this->state['locale'];
     }
 
-    public function getState(): string
+    public function getRoles(): array
     {
-        return $this->state['state'];
+        return [$this->state['role']];
     }
 
-    public function getFirstname(): ?string
+    public function getTokens(): array
     {
-        return $this->state['firstname'] ?? null;
+        return $this->state['tokens'];
     }
 
-    public function getLastname(): ?string
+    public function getToken(string $type): ?array
     {
-        return $this->state['lastname'] ?? null;
+        foreach ($this->getTokens() as $token) {
+            if ($type === $token['@type']) {
+                return $token;
+            }
+        }
     }
 
-    private function whenUserWasRegistered(UserWasRegistered $userWasRegistered)
+    public function getPassword(): string
+    {
+        return $this->state['passwordHash'];
+    }
+
+    public function isAccountNonExpired(): bool
+    {
+        return $this->state['state'] !== 'deleted';
+    }
+
+    public function isAccountNonLocked(): bool
+    {
+        return $this->state['state'] !== 'deactivated';
+    }
+
+    /*
+     * Login event is applied after symfony authentication so performing token
+     * checks here will block valid login. UserTokenAuthenticator handles
+     * checks instead. RememberMe services do not do post-auth checks,
+     * so in any case this is not executed for auto-logins via cookie...
+     */
+    public function isCredentialsNonExpired(): bool
+    {
+        return true;
+    }
+
+    /*
+     * So instead we have a method for doing additional checks outside the
+     * standard symfony flow...
+     */
+    public function isAuthTokenNonExpired(): bool
+    {
+        /*
+         * @todo need to invalidate on token string changes as well but that should be
+         * done somehow in the AbstractToken::hasUserChanged() method, which is private..
+         */
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->isAccountNonExpired() && $this->isAccountNonLocked();
+    }
+
+    public function getSalt(): void
+    {
+    }
+
+    public function eraseCredentials(): void
+    {
+    }
+
+    private function whenUserWasRegistered(UserWasRegistered $userWasRegistered): self
     {
         return self::fromArray(array_merge(
             $this->state,
@@ -70,16 +114,12 @@ final class User implements ProjectionInterface, AdvancedUserInterface
                 'role' => $userWasRegistered->getRole()->toNative(),
                 'locale' => $userWasRegistered->getLocale()->toNative(),
                 'passwordHash' => $userWasRegistered->getPasswordHash()->toNative(),
-                'state' => $userWasRegistered->getState()->toNative(),
-                'firstname' => $userWasRegistered->getFirstname()
-                    ? $userWasRegistered->getFirstname()->toNative() : null,
-                'lastname' => $userWasRegistered->getLastname()
-                    ? $userWasRegistered->getLastname()->toNative() : null,
+                'state' => $userWasRegistered->getState()->toNative()
             ]
         ));
     }
 
-    private function whenUserWasActivated(UserWasActivated $userWasActivated)
+    private function whenUserWasActivated(UserWasActivated $userWasActivated): self
     {
         return self::fromArray(array_merge(
             $this->state,
@@ -90,7 +130,7 @@ final class User implements ProjectionInterface, AdvancedUserInterface
         ));
     }
 
-    private function whenAuthTokenWasAdded(AuthTokenWasAdded $tokenWasAdded)
+    private function whenAuthTokenWasAdded(AuthTokenWasAdded $tokenWasAdded): self
     {
         return self::fromArray(array_merge(
             $this->state,
@@ -106,14 +146,14 @@ final class User implements ProjectionInterface, AdvancedUserInterface
         ));
     }
 
-    private function whenVerifyTokenWasAdded(VerifyTokenWasAdded $tokenWasAdded)
+    private function whenVerifyTokenWasAdded(VerifyTokenWasAdded $tokenWasAdded): self
     {
         //@todo better token merging
         return self::fromArray(array_merge_recursive(
             array_merge(
                 $this->state,
                 ['aggregateRevision' => $tokenWasAdded->getAggregateRevision()->toNative()]
-            ),
+                ),
             [
                 'tokens' => [[
                     'id' => $tokenWasAdded->getId()->toNative(),
@@ -124,7 +164,7 @@ final class User implements ProjectionInterface, AdvancedUserInterface
         ));
     }
 
-    private function whenVerifyTokenWasRemoved(VerifyTokenWasRemoved $tokenWasRemoved)
+    private function whenVerifyTokenWasRemoved(VerifyTokenWasRemoved $tokenWasRemoved): self
     {
         $tokens = [];
         foreach ($this->getTokens() as $token) {
@@ -141,7 +181,7 @@ final class User implements ProjectionInterface, AdvancedUserInterface
         ));
     }
 
-    private function whenUserWasLoggedIn(UserWasLoggedIn $userWasLoggedIn)
+    private function whenUserWasLoggedIn(UserWasLoggedIn $userWasLoggedIn): self
     {
         //@todo better token updating
         $tokens = [];
@@ -161,7 +201,7 @@ final class User implements ProjectionInterface, AdvancedUserInterface
         ));
     }
 
-    private function whenUserWasLoggedOut(UserWasLoggedOut $userWasLoggedOut)
+    private function whenUserWasLoggedOut(UserWasLoggedOut $userWasLoggedOut): self
     {
         $tokens = [];
         foreach ($this->getTokens() as $token) {
@@ -179,85 +219,5 @@ final class User implements ProjectionInterface, AdvancedUserInterface
                 'tokens' => $tokens
             ]
         ));
-    }
-
-    public function getRoles(): array
-    {
-        return [$this->state['role']];
-    }
-
-    public function getTokens(): array
-    {
-        return $this->state['tokens'];
-    }
-
-    public function getToken(string $type)
-    {
-        foreach ($this->getTokens() as $token) {
-            if ($type === $token['@type']) {
-                return $token;
-            }
-        }
-    }
-
-    public function getPassword(): string
-    {
-        return $this->getPasswordHash();
-    }
-
-    public function isAccountNonExpired()
-    {
-        return $this->isEnabled();
-    }
-
-    public function isAccountNonLocked()
-    {
-        return $this->state['state'] !== 'deleted';
-    }
-
-    /*
-     * Login event is applied after symfony authentication so performing token
-     * checks here will block valid login. UserTokenAuthenticator handles
-     * checks instead. RememberMe services do not do post-auth checks,
-     * so in any case this is not executed for auto-logins via cookie...
-     */
-    public function isCredentialsNonExpired()
-    {
-        return true;
-    }
-
-    /*
-     * So instead we have a method for doing additional checks outside the
-     * standard symfony flow...
-     */
-    public function isAuthenticationTokenNonExpired()
-    {
-        /*
-         * @todo need to invalidate on token string changes as well but that should be
-         * done somehow in the AbstractToken::hasUserChanged() method, which is private..
-         */
-    }
-
-    public function isEnabled()
-    {
-        return $this->state['state'] !== 'deactivated';
-    }
-
-    public function isActivated()
-    {
-        $this->state['state'] === 'activated';
-    }
-
-    public function getSalt()
-    {
-    }
-
-    public function eraseCredentials()
-    {
-    }
-
-    public function toArray(): array
-    {
-        return $this->state;
     }
 }

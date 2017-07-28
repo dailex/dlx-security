@@ -28,10 +28,6 @@ final class UserWasRegistered extends DomainEvent
 
     private $state;
 
-    private $firstname;
-
-    private $lastname;
-
     public static function getAggregateRootClass(): string
     {
         return User::class;
@@ -46,9 +42,7 @@ final class UserWasRegistered extends DomainEvent
             $registerUser->getRole(),
             $registerUser->getLocale(),
             $registerUser->getPasswordHash(),
-            UserState::fromNative(UserState::INITIAL),
-            $registerUser->getFirstname(),
-            $registerUser->getLastname()
+            UserState::fromNative(UserState::INITIAL)
         );
     }
 
@@ -62,8 +56,6 @@ final class UserWasRegistered extends DomainEvent
             Text::fromNative($nativeValues['locale']),
             Text::fromNative($nativeValues['password_hash']),
             UserState::fromNative($nativeValues['state']),
-            array_key_exists('firstname', $nativeValues) ? Text::fromNative($nativeValues['firstname']) : null,
-            array_key_exists('lastname', $nativeValues) ? Text::fromNative($nativeValues['lastname']) : null,
             AggregateRevision::fromNative($nativeValues['aggregateRevision'])
         );
     }
@@ -103,38 +95,17 @@ final class UserWasRegistered extends DomainEvent
         return $this->state;
     }
 
-    public function getFirstname(): ?Text
-    {
-        return $this->firstname;
-    }
-
-    public function getLastname(): ?Text
-    {
-        return $this->lastname;
-    }
-
     public function toArray(): array
     {
-        $mandatoryValues = [
-            'username' => $this->username->toNative(),
-            'email' => $this->email->toNative(),
-            'role' => $this->role->toNative(),
-            'locale' => $this->locale->toNative(),
-            'password_hash' => $this->passwordHash->toNative(),
-            'state' => $this->state->toNative()
-        ];
-
-        $optionalValues = [];
-        if (!is_null($this->firstname)) {
-            $optionalValues['firstname'] = $this->firstname->toNative();
-        }
-        if (!is_null($this->lastname)) {
-            $optionalValues['lastname'] = $this->lastname->toNative();
-        }
-
         return array_merge(
-            $mandatoryValues,
-            $optionalValues,
+            [
+                'username' => $this->username->toNative(),
+                'email' => $this->email->toNative(),
+                'role' => $this->role->toNative(),
+                'locale' => $this->locale->toNative(),
+                'password_hash' => $this->passwordHash->toNative(),
+                'state' => $this->state->toNative()
+            ],
             parent::toArray()
         );
     }
@@ -147,8 +118,6 @@ final class UserWasRegistered extends DomainEvent
         Text $locale,
         Text $passwordHash,
         UserState $state,
-        Text $firstname = null,
-        Text $lastname = null,
         AggregateRevision $revision = null
     ) {
         parent::__construct($aggregateId, $revision);
@@ -158,7 +127,5 @@ final class UserWasRegistered extends DomainEvent
         $this->locale = $locale;
         $this->passwordHash = $passwordHash;
         $this->state = $state;
-        $this->firstname = $firstname;
-        $this->lastname = $lastname;
     }
 }

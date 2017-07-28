@@ -119,8 +119,6 @@ final class RegisterController
                 'first_options'  => ['label' => 'Password'],
                 'second_options' => ['label' => 'Repeat Password']
             ])
-            ->add('firstname', TextType::class, ['required' => false])
-            ->add('lastname', TextType::class, ['required' => false])
             ->getForm();
     }
 }

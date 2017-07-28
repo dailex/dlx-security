@@ -23,8 +23,6 @@ final class UserEntityType extends EntityType
             Attribute::define('username', Text::class, $this),
             Attribute::define('email', Email::class, $this),
             Attribute::define('role', UserRole::class, $this),
-            Attribute::define('firstname', Text::class, $this),
-            Attribute::define('lastname', Text::class, $this),
             Attribute::define('locale', Text::class, $this),
             Attribute::define('passwordHash', Text::class, $this),
             Attribute::define('state', UserState::class, $this),

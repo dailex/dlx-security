@@ -26,10 +26,6 @@ final class RegisterUser extends Command
 
     private $authTokenExpiresAt;
 
-    private $firstname;
-
-    private $lastname;
-
     public static function getAggregateRootClass(): string
     {
         return User::class;
@@ -44,9 +40,7 @@ final class RegisterUser extends Command
             UserRole::fromNative($nativeValues['role']),
             Text::fromNative($nativeValues['locale']),
             Text::fromNative($nativeValues['passwordHash']),
-            Timestamp::fromNative($nativeValues['authTokenExpiresAt']),
-            array_key_exists('firstname', $nativeValues) ? Text::fromNative($nativeValues['firstname']) : null,
-            array_key_exists('lastname', $nativeValues) ? Text::fromNative($nativeValues['lastname']) : null
+            Timestamp::fromNative($nativeValues['authTokenExpiresAt'])
         );
     }
 
@@ -80,38 +74,17 @@ final class RegisterUser extends Command
         return $this->authTokenExpiresAt;
     }
 
-    public function getFirstname(): ?Text
-    {
-        return $this->firstname;
-    }
-
-    public function getLastname(): ?Text
-    {
-        return $this->lastname;
-    }
-
     public function toArray(): array
     {
-        $mandatoryValues = [
-            'username' => $this->username->toNative(),
-            'email' => $this->email->toNative(),
-            'role' => $this->role->toNative(),
-            'locale' => $this->locale->toNative(),
-            'passwordHash' => $this->passwordHash->toNative(),
-            'authTokenExpiresAt' => $this->authTokenExpiresAt->toNative()
-        ];
-
-        $optionalValues = [];
-        if (!is_null($this->firstname)) {
-            $optionalValues['firstname'] = $this->firstname->toNative();
-        }
-        if (!is_null($this->lastname)) {
-            $optionalValues['lastname'] = $this->lastname->toNative();
-        }
-
         return array_merge(
-            $mandatoryValues,
-            $optionalValues,
+            [
+                'username' => $this->username->toNative(),
+                'email' => $this->email->toNative(),
+                'role' => $this->role->toNative(),
+                'locale' => $this->locale->toNative(),
+                'passwordHash' => $this->passwordHash->toNative(),
+                'authTokenExpiresAt' => $this->authTokenExpiresAt->toNative()
+            ],
             parent::toArray()
         );
     }
@@ -123,9 +96,7 @@ final class RegisterUser extends Command
         UserRole $role,
         Text $locale,
         Text $passwordHash,
-        Timestamp $authTokenExpiresAt,
-        Text $firstname = null,
-        Text $lastname = null
+        Timestamp $authTokenExpiresAt
     ) {
         parent::__construct($aggregateId);
         $this->username = $username;
@@ -134,7 +105,5 @@ final class RegisterUser extends Command
         $this->locale = $locale;
         $this->passwordHash = $passwordHash;
         $this->authTokenExpiresAt = $authTokenExpiresAt;
-        $this->firstname = $firstname;
-        $this->lastname = $lastname;
     }
 }

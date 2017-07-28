@@ -65,26 +65,6 @@ final class UserEntity extends Entity
         return $this->withValue('passwordHash', $passwordHash);
     }
 
-    public function getFirstname(): ?Text
-    {
-        return $this->get('firstname');
-    }
-
-    public function withFirstname(Text $firstname): self
-    {
-        return $this->withValue('firstname', $firstname);
-    }
-
-    public function getLastname(): ?Text
-    {
-        return $this->get('lastname');
-    }
-
-    public function withLastname(Text $lastname): self
-    {
-        return $this->withValue('lastname', $lastname);
-    }
-
     public function getLocale(): Text
     {
         return $this->get('locale');
