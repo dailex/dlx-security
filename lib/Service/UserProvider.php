@@ -101,7 +101,17 @@ final class UserProvider implements UserProviderInterface, OAuthUserProviderInte
 
     public function userExists(string $username, string $email, array $ignoreIds = []): bool
     {
-        $users = $this->getUserRepository()->search(new Elasticsearch5Query, 0, 1);
+        $users = $this->getUserRepository()->search(new Elasticsearch5Query([
+            'query' => [
+                //@todo make sure this is filter context
+                'bool' => [
+                    'should' => [
+                        ['term' => ['username' => $username]],
+                        ['term' => ['email' => $email]]
+                    ]
+                ]
+            ]
+        ]), 0, 1);
 
         return $users->count() > 0;
     }
