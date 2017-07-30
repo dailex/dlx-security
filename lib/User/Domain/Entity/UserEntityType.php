@@ -2,10 +2,10 @@
 
 namespace Dlx\Security\User\Domain\Entity;
 
+use Daikon\Entity\Entity\EntityInterface;
 use Daikon\Entity\EntityType\Attribute;
 use Daikon\Entity\EntityType\EntityType;
 use Daikon\Entity\EntityType\NestedEntityListAttribute;
-use Daikon\Entity\Entity\TypedEntityInterface;
 use Daikon\Entity\ValueObject\Email;
 use Daikon\Entity\ValueObject\Text;
 use Daikon\Entity\ValueObject\Uuid;
@@ -38,7 +38,7 @@ final class UserEntityType extends EntityType
         ]);
     }
 
-    public function makeEntity(array $userState = [], TypedEntityInterface $parent = null): TypedEntityInterface
+    public function makeEntity(array $userState = [], EntityInterface $parent = null): EntityInterface
     {
         $userState['@type'] = $this;
         $userState['@parent'] = $parent;

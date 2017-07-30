@@ -51,8 +51,8 @@ final class User implements AggregateRootInterface
 
     public function activate(ActivateUser $activateUser): self
     {
-        return $this->reflectThat(UserWasActivated::viaCommand($activateUser));
-//         ->reflectThat(VerifyTokenWasRemoved::viaCommand($activateUser));
+        return $this->reflectThat(UserWasActivated::viaCommand($activateUser))
+            ->reflectThat(VerifyTokenWasRemoved::viaCommand($activateUser));
     }
 
     private function whenUserWasRegistered(UserWasRegistered $userWasRegistered): void

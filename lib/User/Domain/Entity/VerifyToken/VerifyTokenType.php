@@ -2,7 +2,7 @@
 
 namespace Dlx\Security\User\Domain\Entity\VerifyToken;
 
-use Daikon\Entity\Entity\TypedEntityInterface;
+use Daikon\Entity\Entity\EntityInterface;
 use Daikon\Entity\EntityType\Attribute;
 use Daikon\Entity\EntityType\AttributeInterface;
 use Daikon\Entity\EntityType\EntityType;
@@ -24,7 +24,7 @@ final class VerifyTokenType extends EntityType
         ], $parentAttribute);
     }
 
-    public function makeEntity(array $tokenState = [], TypedEntityInterface $parent = null): TypedEntityInterface
+    public function makeEntity(array $tokenState = [], EntityInterface $parent = null): EntityInterface
     {
         $tokenState['@type'] = $this;
         $tokenState['@parent'] = $parent;

@@ -170,7 +170,7 @@ final class User implements DailexUserInterface
     {
         $tokens = [];
         foreach ($this->getTokens() as $token) {
-            if (!$token['@type'] === VerifyTokenType::getName()) {
+            if ($token['@type'] !== VerifyTokenType::getName()) {
                 $tokens[] = $token;
             }
         }
