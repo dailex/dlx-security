@@ -3,7 +3,6 @@
 namespace Dlx\Security\User\Repository\Standard;
 
 use Daikon\ReadModel\Projection\ProjectionTrait;
-use Dlx\Security\User\Domain\Entity\AuthToken\AuthToken;
 use Dlx\Security\User\Domain\Entity\AuthToken\AuthTokenType;
 use Dlx\Security\User\Domain\Entity\VerifyToken\VerifyTokenType;
 use Dlx\Security\User\Domain\Event\AuthTokenWasAdded;
@@ -89,6 +88,8 @@ final class User implements DailexUserInterface
          * @todo need to invalidate on token string changes as well but that should be
          * done somehow in the AbstractToken::hasUserChanged() method, which is private..
          */
+        $token = $this->getToken(AuthTokenType::getName());
+        return new \DateTimeImmutable('now') < new \DateTimeImmutable($token['expiresAt']);
     }
 
     public function isEnabled(): bool
