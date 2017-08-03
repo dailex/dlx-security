@@ -127,10 +127,10 @@ class UserProviderProvisioner implements ProvisionerInterface, EventListenerProv
         if ($rolesSettings = $crateSettings['roles'] ?? []) {
             $roleHierarchy = array_merge(
                 $roleHierarchy,
-                $rolesSettings['role_hierarchy']
+                $rolesSettings['role_hierarchy'] ?? []
             );
             $accessRules = array_merge(
-                $rolesSettings['access_rules'],
+                $rolesSettings['access_rules'] ?? [],
                 $accessRules
             );
         }
