@@ -34,7 +34,7 @@ final class CollectionController
     private function loadUsers($query, $page, $size)
     {
         $repository = $this->repositoryMap->get('dlx.security.user.standard');
-        $users = $repository->search(new Elasticsearch5Query, 0, 10);
+        $users = $repository->search(new Elasticsearch5Query, 0, 10); //@todo correct query
 
         return (new Pagerfanta(new FixedAdapter($users->count(), $users->toArray())))
             ->setMaxPerPage($size) // call before setCurrentPage()
