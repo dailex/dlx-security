@@ -20,7 +20,7 @@ migration_adapters:
     class: Daikon\Elasticsearch5\Migration\Elasticsearch5MigrationAdapter
     connector: dlx.security.projection_store.standard
     settings:
-      type: dlx-testing-migration_list
+      type: dlx-security-migration_list
 
 migration_targets:
   dlx.security.event_store:
