@@ -1,14 +1,24 @@
 <?php
 
-namespace Dlx\Security\User\Domain\Entity\VerifyToken;
+namespace Dlx\Security\User\Domain\Entity;
 
-use Daikon\Entity\Entity\NestedEntity;
+use Daikon\Entity\Entity\Attribute;
+use Daikon\Entity\Entity\AttributeMap;
+use Daikon\Entity\Entity\Entity;
 use Daikon\Entity\ValueObject\Uuid;
 use Daikon\Entity\ValueObject\ValueObjectInterface;
 use Dlx\Security\User\Domain\ValueObject\RandomToken;
 
-final class VerifyToken extends NestedEntity
+final class VerifyToken extends Entity
 {
+    public static function getAttributeMap(): AttributeMap
+    {
+        return new AttributeMap([
+            Attribute::define('id', Uuid::class),
+            Attribute::define('token', RandomToken::class)
+        ]);
+    }
+
     public function getIdentity(): ValueObjectInterface
     {
         return $this->getId();

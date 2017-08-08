@@ -7,9 +7,13 @@ use Daikon\Entity\ValueObject\ValueObjectInterface;
 
 final class UserState implements ValueObjectInterface
 {
-    public const INITIAL = 'unverified';
+    public const UNVERIFIED = 'unverified';
 
-    private const NIL = '';
+    public const ACTIVATED = 'activated';
+
+    public const DEACTIVATED = 'deactivated';
+
+    public const DELETED = 'deleted';
 
     private const STATES = [
         'unverified',
@@ -31,25 +35,30 @@ final class UserState implements ValueObjectInterface
         return $this->state;
     }
 
-    public static function makeEmpty(): ValueObjectInterface
-    {
-        return new self(self::NIL);
-    }
-
     public function equals(ValueObjectInterface $otherValue): bool
     {
         Assertion::isInstanceOf($otherValue, UserState::class);
         return $this->toNative() === $otherValue->toNative();
     }
 
-    public function isInitial(): bool
+    public function isUnverified(): bool
     {
         return $this->state === self::INITIAL;
     }
 
-    public function isEmpty(): bool
+    public function isActivated(): bool
     {
-        return $this->state === self::NIL;
+        return $this->state === self::ACTIVATED;
+    }
+
+    public function isDeactivated(): bool
+    {
+        return $this->state === self::DEACTIVATED;
+    }
+
+    public function isDeleted(): bool
+    {
+        return $this->state === self::DELETED;
     }
 
     public function __toString(): string

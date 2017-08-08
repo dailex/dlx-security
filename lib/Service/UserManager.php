@@ -9,7 +9,7 @@ use Dlx\Security\User\Domain\Command\ActivateUser;
 use Dlx\Security\User\Domain\Command\LoginUser;
 use Dlx\Security\User\Domain\Command\LogoutUser;
 use Dlx\Security\User\Domain\Command\RegisterUser;
-use Dlx\Security\User\Domain\Entity\AuthToken\AuthTokenType;
+use Dlx\Security\User\Domain\Entity\AuthToken;
 use Dlx\Security\User\Repository\DailexUserInterface;
 use Ramsey\Uuid\Uuid;
 use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
@@ -66,7 +66,7 @@ final class UserManager
 
         $loginUser = LoginUser::fromArray([
             'aggregateId' => $user->getAggregateId(),
-            'authTokenId' => $user->getToken(AuthTokenType::getName())['id'],
+            'authTokenId' => $user->getToken(AuthToken::class)['id'],
             'authTokenExpiresAt' => gmdate(Timestamp::NATIVE_FORMAT, strtotime('+1 month'))
         ]);
 
@@ -79,7 +79,7 @@ final class UserManager
 
         $logoutUser = LogoutUser::fromArray([
             'aggregateId' => $user->getAggregateId(),
-            'authTokenId' => $user->getToken(AuthTokenType::getName())['id']
+            'authTokenId' => $user->getToken(AuthToken::class)['id']
         ]);
 
         $this->messageBus->publish($logoutUser, 'commands');

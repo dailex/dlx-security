@@ -2,29 +2,35 @@
 
 namespace Dlx\Security\User\Domain\Entity;
 
+use Daikon\Entity\Entity\Attribute;
+use Daikon\Entity\Entity\AttributeMap;
 use Daikon\Entity\Entity\Entity;
-use Daikon\Entity\Entity\NestedEntityList;
 use Daikon\Entity\ValueObject\Email;
 use Daikon\Entity\ValueObject\Text;
 use Daikon\Entity\ValueObject\Uuid;
 use Daikon\Entity\ValueObject\ValueObjectInterface;
-use Daikon\EventSourcing\Aggregate\AggregateId;
-use Dlx\Security\User\Domain\Entity\AuthToken\AuthTokenType;
-use Dlx\Security\User\Domain\Entity\VerifyToken\VerifyToken;
-use Dlx\Security\User\Domain\Entity\VerifyToken\VerifyTokenType;
+use Dlx\Security\User\Domain\ValueObject\TokenList;
 use Dlx\Security\User\Domain\ValueObject\UserRole;
 use Dlx\Security\User\Domain\ValueObject\UserState;
 
 final class UserEntity extends Entity
 {
-    public function getIdentity(): ValueObjectInterface
+    public static function getAttributeMap(): AttributeMap
     {
-        return $this->get('identity');
+        return new AttributeMap([
+            Attribute::define('username', Text::class),
+            Attribute::define('email', Email::class),
+            Attribute::define('role', UserRole::class),
+            Attribute::define('locale', Text::class),
+            Attribute::define('passwordHash', Text::class),
+            Attribute::define('state', UserState::class),
+            Attribute::define('tokens', TokenList::class)
+        ]);
     }
 
-    public function withIdentity(Uuid $identity): self
+    public function getIdentity(): ValueObjectInterface
     {
-        return $this->withValue('identity', $identity);
+        return $this->get('username');
     }
 
     public function getUsername(): Text
@@ -87,19 +93,19 @@ final class UserEntity extends Entity
         return $this->withValue('state', $state);
     }
 
-    public function getTokens(): NestedEntityList
+    public function getTokens(): TokenList
     {
-        return $this->get('tokens') ?? NestedEntityList::makeEmpty();
+        return $this->get('tokens') ?? TokenList::makeEmpty();
     }
 
-    public function withAuthTokenAdded(array $payload): self
+    public function withAuthTokenAdded(AuthToken $authToken): self
     {
-        return $this->addToken($payload, AuthTokenType::getName());
+        return $this->withValue('tokens', $this->getTokens()->push($authToken));
     }
 
-    public function withVerifyTokenAdded(array $payload): self
+    public function withVerifyTokenAdded(VerifyToken $verifyToken): self
     {
-        return $this->addToken($payload, VerifyTokenType::getName());
+        return $this->withValue('tokens', $this->getTokens()->push($verifyToken));
     }
 
     public function withVerifyTokenRemoved(): self
@@ -110,7 +116,7 @@ final class UserEntity extends Entity
                 $tokens[] = $token;
             }
         }
-        return $this->withValue('tokens', NestedEntityList::wrap($tokens));
+        return $this->withValue('tokens', TokenList::wrap($tokens));
     }
 
     public function withUserLoggedIn(array $payload): self
@@ -122,7 +128,7 @@ final class UserEntity extends Entity
             }
             $tokens[] = $token;
         }
-        return $this->withValue('tokens', NestedEntityList::wrap($tokens));
+        return $this->withValue('tokens', TokenList::wrap($tokens));
     }
 
     public function withUserLoggedOut(array $payload): self
@@ -136,19 +142,11 @@ final class UserEntity extends Entity
             }
             $tokens[] = $token;
         }
-        return $this->withValue('tokens', NestedEntityList::wrap($tokens));
+        return $this->withValue('tokens', TokenList::wrap($tokens));
     }
 
     public function withUserActivated(array $payload)
     {
         return $this->withState($payload['state']);
-    }
-
-    private function addToken(array $tokenPayload, string $type): self
-    {
-        $tokensAttribute = $this->getEntityType()->getAttribute('tokens');
-        $tokenType = $tokensAttribute->getValueType()->get($type);
-        $token = $tokenType->makeEntity($tokenPayload, $this);
-        return $this->withValue('tokens', $this->getTokens()->push($token));
     }
 }

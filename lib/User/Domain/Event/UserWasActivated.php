@@ -20,7 +20,7 @@ final class UserWasActivated extends DomainEvent
     {
         return new self(
             $activateUser->getAggregateId(),
-            $activateUser->getState()
+            UserState::fromNative(UserState::ACTIVATED)
         );
     }
 
@@ -50,9 +50,7 @@ final class UserWasActivated extends DomainEvent
 
     public function toArray(): array
     {
-        return array_merge([
-            'state' => $this->state->toNative()
-        ], parent::toArray());
+        return array_merge([ 'state' => $this->state->toNative() ], parent::toArray());
     }
 
     protected function __construct(

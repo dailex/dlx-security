@@ -4,13 +4,14 @@ namespace Dlx\Security\User\Domain\Event;
 
 use Daikon\Entity\ValueObject\Email;
 use Daikon\Entity\ValueObject\Text;
+use Daikon\Entity\ValueObject\Uuid;
 use Daikon\EventSourcing\Aggregate\AggregateId;
 use Daikon\EventSourcing\Aggregate\AggregateRevision;
 use Daikon\EventSourcing\Aggregate\Event\DomainEvent;
 use Daikon\EventSourcing\Aggregate\Event\DomainEventInterface;
 use Daikon\MessageBus\MessageInterface;
-use Dlx\Security\User\Domain\User;
 use Dlx\Security\User\Domain\Command\RegisterUser;
+use Dlx\Security\User\Domain\User;
 use Dlx\Security\User\Domain\ValueObject\UserRole;
 use Dlx\Security\User\Domain\ValueObject\UserState;
 
@@ -42,7 +43,7 @@ final class UserWasRegistered extends DomainEvent
             $registerUser->getRole(),
             $registerUser->getLocale(),
             $registerUser->getPasswordHash(),
-            UserState::fromNative(UserState::INITIAL)
+            UserState::fromNative(UserState::UNVERIFIED)
         );
     }
 

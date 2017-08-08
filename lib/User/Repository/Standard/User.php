@@ -3,8 +3,7 @@
 namespace Dlx\Security\User\Repository\Standard;
 
 use Daikon\ReadModel\Projection\ProjectionTrait;
-use Dlx\Security\User\Domain\Entity\AuthToken\AuthTokenType;
-use Dlx\Security\User\Domain\Entity\VerifyToken\VerifyTokenType;
+use Dlx\Security\User\Domain\Entity\VerifyToken;
 use Dlx\Security\User\Domain\Event\AuthTokenWasAdded;
 use Dlx\Security\User\Domain\Event\UserWasActivated;
 use Dlx\Security\User\Domain\Event\UserWasLoggedIn;
@@ -43,13 +42,14 @@ final class User implements DailexUserInterface
         return $this->state['tokens'];
     }
 
-    public function getToken(string $type): ?array
+    public function getToken(string $tokenFqcn): ?array
     {
         foreach ($this->getTokens() as $token) {
-            if ($type === $token['@type']) {
+            if ($tokenFqcn === $token['@type']) {
                 return $token;
             }
         }
+        return null;
     }
 
     public function getPassword(): string
@@ -88,7 +88,7 @@ final class User implements DailexUserInterface
          * @todo need to invalidate on token string changes as well but that should be
          * done somehow in the AbstractToken::hasUserChanged() method, which is private..
          */
-        $token = $this->getToken(AuthTokenType::getName());
+        $token = $this->getToken(AuthToken::class);
         return new \DateTimeImmutable('now') < new \DateTimeImmutable($token['expiresAt']);
     }
 
@@ -143,7 +143,7 @@ final class User implements DailexUserInterface
                     'id' => $tokenWasAdded->getId()->toNative(),
                     'token' => $tokenWasAdded->getToken()->toNative(),
                     'expiresAt' => $tokenWasAdded->getExpiresAt()->toNative(),
-                    '@type' => AuthTokenType::getName()
+                    '@type' => AuthToken::class
                 ]]
             ]
         ));
@@ -161,7 +161,7 @@ final class User implements DailexUserInterface
                 'tokens' => [[
                     'id' => $tokenWasAdded->getId()->toNative(),
                     'token' => $tokenWasAdded->getToken()->toNative(),
-                    '@type' => VerifyTokenType::getName()
+                    '@type' => VerifyToken::class
                 ]]
             ]
         ));
@@ -171,7 +171,7 @@ final class User implements DailexUserInterface
     {
         $tokens = [];
         foreach ($this->getTokens() as $token) {
-            if ($token['@type'] !== VerifyTokenType::getName()) {
+            if ($token['@type'] !== VerifyToken::class) {
                 $tokens[] = $token;
             }
         }
