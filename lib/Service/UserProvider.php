@@ -113,7 +113,7 @@ final class UserProvider implements UserProviderInterface, OAuthUserProviderInte
             ]
         ]), 0, 1);
 
-        return $users->count() > 0;
+        return !$users->isEmpty();
     }
 
     public function refreshUser(UserInterface $user): DailexUserInterface
