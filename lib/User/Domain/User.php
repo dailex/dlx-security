@@ -3,7 +3,6 @@
 namespace Dlx\Security\User\Domain;
 
 use Daikon\Entity\ValueObject\Uuid;
-use Daikon\EventSourcing\Aggregate\AggregateAlias;
 use Daikon\EventSourcing\Aggregate\AggregateRootInterface;
 use Daikon\EventSourcing\Aggregate\AggregateRootTrait;
 use Dlx\Security\User\Domain\Command\ActivateUser;
@@ -29,11 +28,6 @@ final class User implements AggregateRootInterface
     use AggregateRootTrait;
 
     private $userState;
-
-    public static function getAlias(): AggregateAlias
-    {
-        return AggregateAlias::fromNative('dlx.security.user');
-    }
 
     public static function register(RegisterUser $registerUser): self
     {

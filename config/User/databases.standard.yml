@@ -9,6 +9,15 @@ projectors:
   dlx.security.user.standard:
     class: Daikon\ReadModel\Projector\StandardProjector
     repository: dlx.security.user.standard
+    events:
+      - Dlx\Security\User\Domain\Event\AuthTokenWasAdded
+      - Dlx\Security\User\Domain\Event\UserWasActivated
+      - Dlx\Security\User\Domain\Event\UserWasLoggedIn
+      - Dlx\Security\User\Domain\Event\UserWasLoggedOut
+      - Dlx\Security\User\Domain\Event\UserWasRegistered
+      - Dlx\Security\User\Domain\Event\UserWasUpdated
+      - Dlx\Security\User\Domain\Event\VerifyTokenWasAdded
+      - Dlx\Security\User\Domain\Event\VerifyTokenWasRemoved
 
 repositories:
    dlx.security.user.standard:

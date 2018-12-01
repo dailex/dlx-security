@@ -1,3 +1,13 @@
+dailex:
+  command_router:
+    commands:
+      dlx.security.user:
+        Dlx\Security\User\Domain\Command\ActivateUser: Dlx\Security\User\Handler\ActivateUserHandler
+        Dlx\Security\User\Domain\Command\LoginUser: Dlx\Security\User\Handler\LoginUserHandler
+        Dlx\Security\User\Domain\Command\LogoutUser: Dlx\Security\User\Handler\LogoutUserHandler
+        Dlx\Security\User\Domain\Command\RegisterUser: Dlx\Security\User\Handler\RegisterUserHandler
+        Dlx\Security\User\Domain\Command\UpdateUser: Dlx\Security\User\Handler\UpdateUserHandler
+
 dlx.security:
   user_provider:
     class: Dlx\Security\Service\UserProvider

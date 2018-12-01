@@ -47,7 +47,7 @@ final class UserManager
             $values['locale'] ?? $this->translator->getLocale()
         );
 
-        $registerUser = RegisterUser::fromArray([
+        $registerUser = RegisterUser::fromNative([
             'aggregateId' => $aggregateId,
             'username' => $values['username'],
             'email' => $values['email'],
@@ -64,7 +64,7 @@ final class UserManager
     {
         $this->guardUserStatus($user);
 
-        $loginUser = LoginUser::fromArray([
+        $loginUser = LoginUser::fromNative([
             'aggregateId' => $user->getAggregateId(),
             'authTokenId' => $user->getToken(AuthToken::class)['id'],
             'authTokenExpiresAt' => gmdate(Timestamp::NATIVE_FORMAT, strtotime('+1 month'))
@@ -77,7 +77,7 @@ final class UserManager
     {
         $this->guardUserStatus($user);
 
-        $logoutUser = LogoutUser::fromArray([
+        $logoutUser = LogoutUser::fromNative([
             'aggregateId' => $user->getAggregateId(),
             'authTokenId' => $user->getToken(AuthToken::class)['id']
         ]);
@@ -89,7 +89,7 @@ final class UserManager
     {
         $this->guardUserStatus($user);
 
-        $activateUser = ActivateUser::fromArray([
+        $activateUser = ActivateUser::fromNative([
             'aggregateId' => $user->getAggregateId()
         ]);
 

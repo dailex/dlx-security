@@ -10,7 +10,6 @@ use Daikon\EventSourcing\Aggregate\Event\DomainEvent;
 use Daikon\EventSourcing\Aggregate\Event\DomainEventInterface;
 use Daikon\MessageBus\MessageInterface;
 use Dlx\Security\User\Domain\Command\RegisterUser;
-use Dlx\Security\User\Domain\User;
 use Dlx\Security\User\Domain\ValueObject\RandomToken;
 
 final class VerifyTokenWasAdded extends DomainEvent
@@ -28,19 +27,15 @@ final class VerifyTokenWasAdded extends DomainEvent
         );
     }
 
-    public static function fromArray(array $nativeValues): MessageInterface
+    /** @param array $payload */
+    public static function fromNative($payload): MessageInterface
     {
         return new self(
-            AggregateId::fromNative($nativeValues['aggregateId']),
-            Uuid::fromNative($nativeValues['id']),
-            RandomToken::fromNative($nativeValues['token']),
-            AggregateRevision::fromNative($nativeValues['aggregateRevision'])
+            AggregateId::fromNative($payload['aggregateId']),
+            Uuid::fromNative($payload['id']),
+            RandomToken::fromNative($payload['token']),
+            AggregateRevision::fromNative($payload['aggregateRevision'])
         );
-    }
-
-    public static function getAggregateRootClass(): string
-    {
-        return User::class;
     }
 
     public function conflictsWith(DomainEventInterface $otherEvent): bool
@@ -58,12 +53,12 @@ final class VerifyTokenWasAdded extends DomainEvent
         return $this->token;
     }
 
-    public function toArray(): array
+    public function toNative(): array
     {
         return array_merge([
             'id' => $this->id->toNative(),
             'token' => $this->token->toNative()
-        ], parent::toArray());
+        ], parent::toNative());
     }
 
     protected function __construct(

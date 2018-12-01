@@ -7,7 +7,6 @@ use Daikon\Entity\ValueObject\Uuid;
 use Daikon\EventSourcing\Aggregate\AggregateId;
 use Daikon\EventSourcing\Aggregate\Command\Command;
 use Daikon\MessageBus\MessageInterface;
-use Dlx\Security\User\Domain\User;
 
 final class LoginUser extends Command
 {
@@ -15,17 +14,13 @@ final class LoginUser extends Command
 
     private $authTokenExpiresAt;
 
-    public static function getAggregateRootClass(): string
-    {
-        return User::class;
-    }
-
-    public static function fromArray(array $nativeValues): MessageInterface
+    /** @param array $state */
+    public static function fromNative($state): MessageInterface
     {
         return new self(
-            AggregateId::fromNative($nativeValues['aggregateId']),
-            Uuid::fromNative($nativeValues['authTokenId']),
-            Timestamp::fromNative($nativeValues['authTokenExpiresAt'])
+            AggregateId::fromNative($state['aggregateId']),
+            Uuid::fromNative($state['authTokenId']),
+            Timestamp::fromNative($state['authTokenExpiresAt'])
         );
     }
 
@@ -39,14 +34,14 @@ final class LoginUser extends Command
         return $this->authTokenExpiresAt;
     }
 
-    public function toArray(): array
+    public function toNative(): array
     {
         return array_merge(
             [
                 'authTokenId' => $this->authTokenId->toNative(),
                 'authTokenExpiresAt' => $this->authTokenExpiresAt->toNative()
             ],
-            parent::toArray()
+            parent::toNative()
         );
     }
 

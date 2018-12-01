@@ -7,7 +7,6 @@ use Daikon\Entity\ValueObject\Uuid;
 use Daikon\EventSourcing\Aggregate\AggregateId;
 use Daikon\EventSourcing\Aggregate\Command\Command;
 use Daikon\MessageBus\MessageInterface;
-use Dlx\Security\User\Domain\User;
 use Dlx\Security\User\Domain\ValueObject\RandomToken;
 
 final class LogoutUser extends Command
@@ -18,16 +17,12 @@ final class LogoutUser extends Command
 
     private $authTokenExpiresAt;
 
-    public static function getAggregateRootClass(): string
-    {
-        return User::class;
-    }
-
-    public static function fromArray(array $nativeValues): MessageInterface
+    /** @param array $state */
+    public static function fromNative($state): MessageInterface
     {
         return new self(
-            AggregateId::fromNative($nativeValues['aggregateId']),
-            Uuid::fromNative($nativeValues['authTokenId']),
+            AggregateId::fromNative($state['aggregateId']),
+            Uuid::fromNative($state['authTokenId']),
             RandomToken::generate(),
             Timestamp::now()
         );
@@ -48,7 +43,7 @@ final class LogoutUser extends Command
         return $this->authTokenExpiresAt;
     }
 
-    public function toArray(): array
+    public function toNative(): array
     {
         return array_merge(
             [
@@ -56,7 +51,7 @@ final class LogoutUser extends Command
                 'authToken' => $this->authToken->toNative(),
                 'authTokenExpiresAt' => $this->authTokenExpiresAt->toNative()
             ],
-            parent::toArray()
+            parent::toNative()
         );
     }
 

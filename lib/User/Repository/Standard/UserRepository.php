@@ -33,12 +33,12 @@ final class UserRepository implements RepositoryInterface
 
     public function persist(ProjectionInterface $projection): bool
     {
-        return $this->storageAdapter->write($projection->getAggregateId(), $projection->toArray());
+        return $this->storageAdapter->write($projection->getAggregateId(), $projection->toNative());
     }
 
     public function makeProjection(): ProjectionInterface
     {
-        return User::fromArray([
+        return User::fromNative([
             '@type' => User::class,
             '@parent' => null
         ]);

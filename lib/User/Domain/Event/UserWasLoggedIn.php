@@ -11,7 +11,6 @@ use Daikon\EventSourcing\Aggregate\Event\DomainEvent;
 use Daikon\EventSourcing\Aggregate\Event\DomainEventInterface;
 use Daikon\MessageBus\MessageInterface;
 use Dlx\Security\User\Domain\Command\LoginUser;
-use Dlx\Security\User\Domain\User;
 
 final class UserWasLoggedIn extends DomainEvent
 {
@@ -28,7 +27,8 @@ final class UserWasLoggedIn extends DomainEvent
         );
     }
 
-    public static function fromArray(array $nativeValues): MessageInterface
+    /** @param array $payload */
+    public static function fromNative($payload): MessageInterface
     {
         return new self(
             AggregateId::fromNative($nativeValues['aggregateId']),
@@ -36,11 +36,6 @@ final class UserWasLoggedIn extends DomainEvent
             Timestamp::fromNative($nativeValues['authTokenExpiresAt']),
             AggregateRevision::fromNative($nativeValues['aggregateRevision'])
         );
-    }
-
-    public static function getAggregateRootClass(): string
-    {
-        return User::class;
     }
 
     public function conflictsWith(DomainEventInterface $otherEvent): bool
@@ -58,12 +53,12 @@ final class UserWasLoggedIn extends DomainEvent
         return $this->authTokenExpiresAt;
     }
 
-    public function toArray(): array
+    public function toNative(): array
     {
         return array_merge([
             'authTokenId' => $this->authTokenId->toNative(),
             'authTokenExpiresAt' => $this->authTokenExpiresAt->toNative()
-        ], parent::toArray());
+        ], parent::toNative());
     }
 
     protected function __construct(
