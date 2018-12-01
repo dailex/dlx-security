@@ -11,7 +11,6 @@ use Daikon\EventSourcing\Aggregate\Event\DomainEvent;
 use Daikon\EventSourcing\Aggregate\Event\DomainEventInterface;
 use Daikon\MessageBus\MessageInterface;
 use Dlx\Security\User\Domain\Command\RegisterUser;
-use Dlx\Security\User\Domain\User;
 use Dlx\Security\User\Domain\ValueObject\UserRole;
 use Dlx\Security\User\Domain\ValueObject\UserState;
 
@@ -29,11 +28,6 @@ final class UserWasRegistered extends DomainEvent
 
     private $state;
 
-    public static function getAggregateRootClass(): string
-    {
-        return User::class;
-    }
-
     public static function viaCommand(RegisterUser $registerUser): self
     {
         return new self(
@@ -47,17 +41,18 @@ final class UserWasRegistered extends DomainEvent
         );
     }
 
-    public static function fromArray(array $nativeValues): MessageInterface
+    /** @param array $payload */
+    public static function fromNative($payload): MessageInterface
     {
         return new self(
-            AggregateId::fromNative($nativeValues['aggregateId']),
-            Text::fromNative($nativeValues['username']),
-            Email::fromNative($nativeValues['email']),
-            UserRole::fromNative($nativeValues['role']),
-            Text::fromNative($nativeValues['locale']),
-            Text::fromNative($nativeValues['password_hash']),
-            UserState::fromNative($nativeValues['state']),
-            AggregateRevision::fromNative($nativeValues['aggregateRevision'])
+            AggregateId::fromNative($payload['aggregateId']),
+            Text::fromNative($payload['username']),
+            Email::fromNative($payload['email']),
+            UserRole::fromNative($payload['role']),
+            Text::fromNative($payload['locale']),
+            Text::fromNative($payload['password_hash']),
+            UserState::fromNative($payload['state']),
+            AggregateRevision::fromNative($payload['aggregateRevision'])
         );
     }
 
@@ -96,7 +91,7 @@ final class UserWasRegistered extends DomainEvent
         return $this->state;
     }
 
-    public function toArray(): array
+    public function toNative(): array
     {
         return array_merge(
             [
@@ -107,7 +102,7 @@ final class UserWasRegistered extends DomainEvent
                 'password_hash' => $this->passwordHash->toNative(),
                 'state' => $this->state->toNative()
             ],
-            parent::toArray()
+            parent::toNative()
         );
     }
 

@@ -9,7 +9,6 @@ use Daikon\EventSourcing\Aggregate\Event\DomainEvent;
 use Daikon\EventSourcing\Aggregate\Event\DomainEventInterface;
 use Daikon\MessageBus\MessageInterface;
 use Dlx\Security\User\Domain\Command\ActivateUser;
-use Dlx\Security\User\Domain\User;
 use Dlx\Security\User\Domain\ValueObject\UserState;
 
 final class UserWasActivated extends DomainEvent
@@ -24,18 +23,14 @@ final class UserWasActivated extends DomainEvent
         );
     }
 
-    public static function fromArray(array $nativeValues): MessageInterface
+    /** @param array $payload */
+    public static function fromNative($payload): MessageInterface
     {
         return new self(
-            AggregateId::fromNative($nativeValues['aggregateId']),
-            UserState::fromNative($nativeValues['state']),
-            AggregateRevision::fromNative($nativeValues['aggregateRevision'])
+            AggregateId::fromNative($payload['aggregateId']),
+            UserState::fromNative($payload['state']),
+            AggregateRevision::fromNative($payload['aggregateRevision'])
         );
-    }
-
-    public static function getAggregateRootClass(): string
-    {
-        return User::class;
     }
 
     public function conflictsWith(DomainEventInterface $otherEvent): bool
@@ -48,9 +43,9 @@ final class UserWasActivated extends DomainEvent
         return $this->state;
     }
 
-    public function toArray(): array
+    public function toNative(): array
     {
-        return array_merge([ 'state' => $this->state->toNative() ], parent::toArray());
+        return array_merge([ 'state' => $this->state->toNative() ], parent::toNative());
     }
 
     protected function __construct(

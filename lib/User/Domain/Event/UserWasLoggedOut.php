@@ -11,7 +11,6 @@ use Daikon\EventSourcing\Aggregate\Event\DomainEvent;
 use Daikon\EventSourcing\Aggregate\Event\DomainEventInterface;
 use Daikon\MessageBus\MessageInterface;
 use Dlx\Security\User\Domain\Command\LogoutUser;
-use Dlx\Security\User\Domain\User;
 use Dlx\Security\User\Domain\ValueObject\RandomToken;
 
 final class UserWasLoggedOut extends DomainEvent
@@ -32,20 +31,16 @@ final class UserWasLoggedOut extends DomainEvent
         );
     }
 
-    public static function fromArray(array $nativeValues): MessageInterface
+    /** @param array $payload */
+    public static function fromNative($payload): MessageInterface
     {
         return new self(
-            AggregateId::fromNative($nativeValues['aggregateId']),
-            Uuid::fromNative($nativeValues['authTokenId']),
-            RandomToken::fromNative($nativeValues['authToken']),
-            Timestamp::fromNative($nativeValues['authTokenExpiresAt']),
-            AggregateRevision::fromNative($nativeValues['aggregateRevision'])
+            AggregateId::fromNative($payload['aggregateId']),
+            Uuid::fromNative($payload['authTokenId']),
+            RandomToken::fromNative($payload['authToken']),
+            Timestamp::fromNative($payload['authTokenExpiresAt']),
+            AggregateRevision::fromNative($payload['aggregateRevision'])
         );
-    }
-
-    public static function getAggregateRootClass(): string
-    {
-        return User::class;
     }
 
     public function conflictsWith(DomainEventInterface $otherEvent): bool
@@ -68,13 +63,13 @@ final class UserWasLoggedOut extends DomainEvent
         return $this->authTokenExpiresAt;
     }
 
-    public function toArray(): array
+    public function toNative(): array
     {
         return array_merge([
             'authTokenId' => $this->authTokenId->toNative(),
             'authToken' => $this->authToken->toNative(),
             'authTokenExpiresAt' => $this->authTokenExpiresAt->toNative()
-        ], parent::toArray());
+        ], parent::toNative());
     }
 
     protected function __construct(

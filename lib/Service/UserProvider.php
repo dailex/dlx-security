@@ -45,7 +45,7 @@ final class UserProvider implements UserProviderInterface, OAuthUserProviderInte
 
     public function loadUserByUsername($username): DailexUserInterface
     {
-        $users = $this->getUserRepository()->search(new Elasticsearch5Query([
+        $users = $this->getUserRepository()->search(Elasticsearch5Query::fromNative([
             'query' => [
                 //@todo make sure this is filter context
                 'bool' => [
@@ -67,7 +67,7 @@ final class UserProvider implements UserProviderInterface, OAuthUserProviderInte
     public function loadUserByToken(string $token, string $type): DailexUserInterface
     {
         //@todo check token type
-        $users = $this->getUserRepository()->search(new Elasticsearch5Query([
+        $users = $this->getUserRepository()->search(Elasticsearch5Query::fromNative([
             'query' => [
                 'term' => ['tokens.token' => $token]
             ]
@@ -82,7 +82,7 @@ final class UserProvider implements UserProviderInterface, OAuthUserProviderInte
 
     public function loadUserByEmail(string $email): DailexUserInterface
     {
-        $users = $this->getUserRepository()->search(new Elasticsearch5Query([
+        $users = $this->getUserRepository()->search(Elasticsearch5Query::fromNative([
             'query' => [
                 'term' => ['email' => $email]
             ]
@@ -101,7 +101,7 @@ final class UserProvider implements UserProviderInterface, OAuthUserProviderInte
 
     public function userExists(string $username, string $email, array $ignoreIds = []): bool
     {
-        $users = $this->getUserRepository()->search(new Elasticsearch5Query([
+        $users = $this->getUserRepository()->search(Elasticsearch5Query::fromNative([
             'query' => [
                 //@todo make sure this is filter context
                 'bool' => [

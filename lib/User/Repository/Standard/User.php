@@ -107,7 +107,7 @@ final class User implements DailexUserInterface
 
     private function whenUserWasRegistered(UserWasRegistered $userWasRegistered): self
     {
-        return self::fromArray(array_merge(
+        return self::fromNative(array_merge(
             $this->state,
             [
                 'aggregateId' => $userWasRegistered->getAggregateId()->toNative(),
@@ -124,7 +124,7 @@ final class User implements DailexUserInterface
 
     private function whenUserWasActivated(UserWasActivated $userWasActivated): self
     {
-        return self::fromArray(array_merge(
+        return self::fromNative(array_merge(
             $this->state,
             [
                 'aggregateRevision' => $userWasActivated->getAggregateRevision()->toNative(),
@@ -135,7 +135,7 @@ final class User implements DailexUserInterface
 
     private function whenAuthTokenWasAdded(AuthTokenWasAdded $tokenWasAdded): self
     {
-        return self::fromArray(array_merge(
+        return self::fromNative(array_merge(
             $this->state,
             [
                 'aggregateRevision' => $tokenWasAdded->getAggregateRevision()->toNative(),
@@ -152,7 +152,7 @@ final class User implements DailexUserInterface
     private function whenVerifyTokenWasAdded(VerifyTokenWasAdded $tokenWasAdded): self
     {
         //@todo better token merging
-        return self::fromArray(array_merge_recursive(
+        return self::fromNative(array_merge_recursive(
             array_merge(
                 $this->state,
                 ['aggregateRevision' => $tokenWasAdded->getAggregateRevision()->toNative()]
@@ -175,7 +175,7 @@ final class User implements DailexUserInterface
                 $tokens[] = $token;
             }
         }
-        return self::fromArray(array_merge(
+        return self::fromNative(array_merge(
             $this->state,
             [
                 'aggregateRevision' => $tokenWasRemoved->getAggregateRevision()->toNative(),
@@ -195,7 +195,7 @@ final class User implements DailexUserInterface
             $tokens[] = $token;
         }
 
-        return self::fromArray(array_merge(
+        return self::fromNative(array_merge(
             $this->state,
             [
                 'aggregateRevision' => $userWasLoggedIn->getAggregateRevision()->toNative(),
@@ -215,7 +215,7 @@ final class User implements DailexUserInterface
             $tokens[] = $token;
         }
 
-        return self::fromArray(array_merge(
+        return self::fromNative(array_merge(
             $this->state,
             [
                 'aggregateRevision' => $userWasLoggedOut->getAggregateRevision()->toNative(),

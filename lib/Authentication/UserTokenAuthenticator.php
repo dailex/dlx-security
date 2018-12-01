@@ -42,12 +42,12 @@ final class UserTokenAuthenticator extends AbstractGuardAuthenticator
             return;
         }
 
-        return $token->getUser()->toArray();
+        return $token->getUser()->toNative();
     }
 
     public function getUser($state, UserProviderInterface $userProvider)
     {
-        return User::fromArray($state);
+        return User::fromNative($state);
     }
 
     public function checkCredentials($credentials, UserInterface $user)

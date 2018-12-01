@@ -47,8 +47,8 @@ class UserProviderProvisioner implements ProvisionerInterface, EventListenerProv
             'development' => [
                 'pattern' => '^/_(profiler|wdt)/',
                 'security' => false
-           ]
-       ] : [];
+            ]
+        ] : [];
 
         $securityFirewalls = array_replace_recursive(
             $devFirewall,
@@ -58,7 +58,7 @@ class UserProviderProvisioner implements ProvisionerInterface, EventListenerProv
                     'pattern' => "^.*$",
                     'anonymous' => true,
                     'users' => $userProviderDelegate
-               ]
+                ]
             ],
             $crateSettings['firewalls'] ?? []
         );
@@ -76,7 +76,7 @@ class UserProviderProvisioner implements ProvisionerInterface, EventListenerProv
                             'https://graph.facebook.com/me?fields=%s',
                             implode(',', (array) $facebookSettings['fields'] ?? ['id', 'name', 'email'])
                         )
-                   ];
+                    ];
                 }
             }
 
@@ -97,10 +97,10 @@ class UserProviderProvisioner implements ProvisionerInterface, EventListenerProv
                                 'failure_path' => 'hlx.security.login',
                                 'default_target_path' => 'home',
                                 'with_csrf' => true
-                           ],
+                            ],
                             'users' => $userProviderDelegate
-                       ]
-                   ],
+                        ]
+                    ],
                     $securityFirewalls
                 );
 
@@ -111,7 +111,7 @@ class UserProviderProvisioner implements ProvisionerInterface, EventListenerProv
                         'oauth.user_info_listener' => function ($app) use ($oauthSettings) {
                             return new OauthInfoListener($app['oauth'], $app['oauth.services'], $oauthSettings);
                         }
-                   ]
+                    ]
                 );
             }
         }
@@ -122,7 +122,7 @@ class UserProviderProvisioner implements ProvisionerInterface, EventListenerProv
             'ROLE_ADMIN' => ['ROLE_USER', 'ROLE_ALLOWED_TO_SWITCH'],
             'administrator' => ['ROLE_ADMIN'],
             'user' => ['ROLE_USER']
-       ];
+        ];
 
         if ($rolesSettings = $crateSettings['roles'] ?? []) {
             $roleHierarchy = array_merge(
@@ -142,7 +142,7 @@ class UserProviderProvisioner implements ProvisionerInterface, EventListenerProv
                 'security.firewalls' => $securityFirewalls,
                 'security.access_rules' => $accessRules,
                 'security.role_hierarchy' => $roleHierarchy
-           ]
+            ]
         );
 
         // register after SecurityServiceProvider
@@ -213,7 +213,7 @@ class UserProviderProvisioner implements ProvisionerInterface, EventListenerProv
                     'httponly' => true,
                     'always_remember_me' => false,
                     'remember_me_parameter' => '_remember_me',
-               ], $options);
+                ], $options);
 
                 return new UserTokenBasedRememberMeServices(
                     [$app['security.user_provider.'.$providerKey]],

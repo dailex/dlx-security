@@ -9,7 +9,6 @@ use Daikon\EventSourcing\Aggregate\AggregateRevision;
 use Daikon\EventSourcing\Aggregate\Event\DomainEvent;
 use Daikon\EventSourcing\Aggregate\Event\DomainEventInterface;
 use Daikon\MessageBus\MessageInterface;
-use Dlx\Security\User\Domain\User;
 use Dlx\Security\User\Domain\Command\UpdateUser;
 
 final class UserWasUpdated extends DomainEvent
@@ -20,19 +19,15 @@ final class UserWasUpdated extends DomainEvent
 
     private $locale;
 
-    public static function getAggregateRootClass(): string
-    {
-        return User::class;
-    }
-
-    public static function fromArray(array $nativeValues): MessageInterface
+    /** @param array $payload */
+    public static function fromNative($payload): MessageInterface
     {
         return new self(
-            AggregateId::fromNative($nativeValues['aggregateId']),
-            Text::fromNative($nativeValues['username']),
-            Email::fromNative($nativeValues['email']),
-            Text::fromNative($nativeValues['locale']),
-            AggregateRevision::fromNative($nativeValues['aggregateRevision'])
+            AggregateId::fromNative($payload['aggregateId']),
+            Text::fromNative($payload['username']),
+            Email::fromNative($payload['email']),
+            Text::fromNative($payload['locale']),
+            AggregateRevision::fromNative($payload['aggregateRevision'])
         );
     }
 
@@ -66,10 +61,10 @@ final class UserWasUpdated extends DomainEvent
         return $this->locale;
     }
 
-    public function toArray(): array
+    public function toNative(): array
     {
         return array_merge(
-            parent::toArray(),
+            parent::toNative(),
             [
                 'username' => $this->username->toNative(),
                 'email' => $this->email->toNative(),

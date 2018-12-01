@@ -8,7 +8,6 @@ use Daikon\EventSourcing\Aggregate\AggregateId;
 use Daikon\EventSourcing\Aggregate\AggregateIdInterface;
 use Daikon\EventSourcing\Aggregate\Command\Command;
 use Daikon\MessageBus\MessageInterface;
-use Dlx\Security\User\Domain\User;
 
 final class UpdateUser extends Command
 {
@@ -18,18 +17,14 @@ final class UpdateUser extends Command
 
     private $locale;
 
-    public static function getAggregateRootClass(): string
-    {
-        return User::class;
-    }
-
-    public static function fromArray(array $nativeValues): MessageInterface
+    /** @param array $state */
+    public static function fromNative($state): MessageInterface
     {
         return new self(
-            AggregateId::fromNative($nativeValues['aggregateId']),
-            Text::fromNative($nativeValues['username']),
-            Email::fromNative($nativeValues['email']),
-            Text::fromNative($nativeValues['locale'])
+            AggregateId::fromNative($state['aggregateId']),
+            Text::fromNative($state['username']),
+            Email::fromNative($state['email']),
+            Text::fromNative($state['locale'])
         );
     }
 
@@ -48,7 +43,7 @@ final class UpdateUser extends Command
         return $this->locale;
     }
 
-    public function toArray(): array
+    public function toNative(): array
     {
         return array_merge(
             [
@@ -56,7 +51,7 @@ final class UpdateUser extends Command
                 'email' => $this->email->toNative(),
                 'locale' => $this->locale->toNative()
             ],
-            parent::toArray()
+            parent::toNative()
         );
     }
 

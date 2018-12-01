@@ -9,7 +9,6 @@ use Daikon\EventSourcing\Aggregate\AggregateId;
 use Daikon\EventSourcing\Aggregate\AggregateIdInterface;
 use Daikon\EventSourcing\Aggregate\Command\Command;
 use Daikon\MessageBus\MessageInterface;
-use Dlx\Security\User\Domain\User;
 use Dlx\Security\User\Domain\ValueObject\UserRole;
 
 final class RegisterUser extends Command
@@ -26,21 +25,17 @@ final class RegisterUser extends Command
 
     private $authTokenExpiresAt;
 
-    public static function getAggregateRootClass(): string
-    {
-        return User::class;
-    }
-
-    public static function fromArray(array $nativeValues): MessageInterface
+    /** @param array $state */
+    public static function fromNative($state): MessageInterface
     {
         return new self(
-            AggregateId::fromNative($nativeValues['aggregateId']),
-            Text::fromNative($nativeValues['username']),
-            Email::fromNative($nativeValues['email']),
-            UserRole::fromNative($nativeValues['role']),
-            Text::fromNative($nativeValues['locale']),
-            Text::fromNative($nativeValues['passwordHash']),
-            Timestamp::fromNative($nativeValues['authTokenExpiresAt'])
+            AggregateId::fromNative($state['aggregateId']),
+            Text::fromNative($state['username']),
+            Email::fromNative($state['email']),
+            UserRole::fromNative($state['role']),
+            Text::fromNative($state['locale']),
+            Text::fromNative($state['passwordHash']),
+            Timestamp::fromNative($state['authTokenExpiresAt'])
         );
     }
 
@@ -74,7 +69,7 @@ final class RegisterUser extends Command
         return $this->authTokenExpiresAt;
     }
 
-    public function toArray(): array
+    public function toNative(): array
     {
         return array_merge(
             [
@@ -85,7 +80,7 @@ final class RegisterUser extends Command
                 'passwordHash' => $this->passwordHash->toNative(),
                 'authTokenExpiresAt' => $this->authTokenExpiresAt->toNative()
             ],
-            parent::toArray()
+            parent::toNative()
         );
     }
 
